@@ -1,0 +1,62 @@
+Total papers: 344
+Year range: 2000–2027
+Total citations across all papers: 3937
+Median citations: 1.0
+
+Papers per year:
+  2000: 1
+  2015: 1
+  2020: 1
+  2021: 1
+  2022: 1
+  2023: 5
+  2024: 35
+  2025: 139
+  2026: 159
+  2027: 1
+
+Top 15 venues:
+  119  arXiv.org
+   15  Zenodo
+   10  Conference on Empirical Methods in Natural Language Processing
+   10  Arxiv
+    6  Proceedings of the 2026 CHI Conference on Human Factors in Computing Systems
+    5  Proceedings of the AAAI/ACM Conference on AI, Ethics, and Society
+    4  International Conference on Learning Representations
+    3  Nature
+    3  North American Chapter of the Association for Computational Linguistics
+    3  Annual Meeting of the Association for Computational Linguistics
+    3  npj Digital Medicine
+    3  medRxiv
+    2  Proceedings of the Extended Abstracts of the 2026 CHI Conference on Human Factors in Computing Systems
+    2  M/C Journal
+
+Top 20 most-cited papers:
+  [ 763 cites, 2023] Towards Understanding Sycophancy in Language Models
+  [ 760 cites, 2022] Discovering Language Model Behaviors with Model-Written Evaluations
+  [ 171 cites, 2025] Persona Vectors: Monitoring and Controlling Character Traits in Language Models
+  [ 157 cites, 2025] Expressing stigma and inappropriate responses prevents LLMs from safely replacing mental health providers.
+        doi: 10.1145/3715275.3732039
+  [ 138 cites, 2023] Simple synthetic data reduces sycophancy in large language models
+  [ 114 cites, 2024] Sycophancy to Subterfuge: Investigating Reward-Tampering in Large Language Models
+  [ 107 cites, 2024] Sycophancy in Large Language Models: Causes and Mitigations
+        doi: 10.1007/978-3-031-92611-2_5
+  [  94 cites, 2024] O1 Replication Journey - Part 2: Surpassing O1-preview through Simple Distillation, Big Progress or Bitter Lesson?
+  [  91 cites, 2023] System 2 Attention (is something you might need too)
+  [  86 cites, 2025] SycEval: Evaluating LLM Sycophancy
+  [  71 cites, 2023] When Large Language Models contradict humans? Large Language Models' Sycophantic Behaviour
+  [  56 cites, 2024] From Yes-Men to Truth-Tellers: Addressing Sycophancy in Large Language Models with Pinpoint Tuning
+  [  53 cites, 2025] When helpfulness backfires: LLMs and the risk of false medical information due to sycophantic behavior
+        doi: 10.1038/s41746-025-02008-z
+  [  52 cites, 2024] Artificial intelligence and qualitative research: The promise and perils of large language model (LLM) 'assistance'
+        doi: 10.1016/j.cpa.2024.102722
+  [  49 cites, 2025] Measuring Sycophancy of Language Models in Multi-turn Dialogues
+        doi: 10.18653/v1/2025.findings-emnlp.121
+  [  45 cites, 2023] How Trustworthy are Open-Source LLMs? An Assessment under Malicious Demonstrations Shows their Vulnerabilities
+  [  42 cites, 2000] Students' motives for communicating with their instructors and affective and cognitive learning
+        doi: 10.2466/pr0.87.7.830-834
+  [  41 cites, 2025] Be Friendly, Not Friends: How LLM Sycophancy Shapes User Trust
+        doi: 10.1145/3772318.3791079
+  [  32 cites, 2024] Monitoring Latent World States in Language Models with Propositional Probes
+  [  32 cites, 2024] Prompt Leakage effect and mitigation strategies for multi-turn LLM Applications
+        doi: 10.18653/v1/2024.emnlp-industry.94
