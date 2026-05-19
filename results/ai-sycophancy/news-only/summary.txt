@@ -76,13 +76,13 @@ Top 15 venues:
    28  Dow Jones Institutional News
    26  News Bites - Private Companies
    24  The Wall Street journal. Eastern edition
-   24  The New York times
    24  CE Noticias Financieras
+   24  The New York times
    21  Mint (New Delhi, India)
    21  The New York Times (Digital Edition)
    19  The Times of India (1861-)
-   16  FT.com
    16  Targeted News Service
+   16  FT.com
    15  The Economist (London)
    13  The Financial times (London ed.)
    12  University Wire

@@ -23,11 +23,11 @@ Top 15 venues:
     6  Proceedings of the 2026 CHI Conference on Human Factors in Computing Systems
     5  Proceedings of the AAAI/ACM Conference on AI, Ethics, and Society
     4  International Conference on Learning Representations
-    3  npj Digital Medicine
-    3  North American Chapter of the Association for Computational Linguistics
-    3  medRxiv
     3  Nature
+    3  North American Chapter of the Association for Computational Linguistics
     3  Annual Meeting of the Association for Computational Linguistics
+    3  npj Digital Medicine
+    3  medRxiv
     2  Proceedings of the Extended Abstracts of the 2026 CHI Conference on Human Factors in Computing Systems
     2  M/C Journal
 
