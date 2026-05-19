@@ -21,10 +21,12 @@ Run:
 """
 
 import argparse
+from datetime import date
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import squarify
 from matplotlib.ticker import MultipleLocator
 
 HERE = Path(__file__).parent
@@ -165,6 +167,100 @@ def plot_combined(df: pd.DataFrame, out: Path, label: str) -> None:
     print(f"Wrote {out}")
 
 
+# Venue-keyword rules for records whose `fields_of_study` is empty
+# (typically WoS-only rows). First match wins, so ordering matters:
+# unambiguous CS conferences first, then medicine/psych, broad CS last.
+VENUE_RULES: list[tuple[str, list[str]]] = [
+    ("Computer Science", [
+        "arxiv", "zenodo", "aaai", "acl ", "naacl", "emnlp", "neurips", "icml",
+        "iclr", "chi conference", "kdd", "ijcai", "natural language",
+        "computational linguistic", "machine learning", "nlp",
+    ]),
+    ("Medicine", [
+        "medic", "clinic", "hospit", "patient", "psychiatr", "surger", "diagnos",
+        "gastroentero", "infection", "epidemiolog", "healthcare", "jmir",
+        "annals of the academy of medicine", "open forum infectious",
+        "research square", "medrxiv", "biorxiv",
+    ]),
+    ("Psychology", ["psycholog", "cognit", "mental", "neurosci", "bj psych"]),
+    ("Education", [
+        "educat", "pedagog", "librarian", "library",
+        "trends in neuroscience and education",
+    ]),
+    ("Law", ["law", "legal", "jurispr"]),
+    ("Economics", ["economic", "finance", "accounting", "business", "management"]),
+    ("Sociology", [
+        "social", "sociolog", "semiotic", "policy", "polit", "cultural",
+        "anthropolog", "m/c journal", "humanit", "ssrn",
+    ]),
+    ("Philosophy", ["philosoph", "ethic", "foundations of science"]),
+    ("Multidisciplinary", ["nature", "pnas", "royal society"]),
+    ("Computer Science", [
+        "computer", "software", "artificial intelligence", "ai &", "ai,",
+        "linguistic", "electronic", "engineer", "workshop on",
+        "information technology", "knowledge-based",
+        "international journal of human-computer interaction",
+        "international conference on artificial intelligence",
+    ]),
+]
+
+
+def assign_domain(row: pd.Series) -> str:
+    """Assign a single domain label per paper.
+
+    S2's `fields_of_study` is authoritative when present (take the first
+    listed field, which is S2's primary classification). Otherwise infer
+    from venue with substring keyword rules; fall back to "Other".
+    """
+    fos = (row.get("fields_of_study") or "").strip()
+    if fos:
+        return fos.split(";")[0].strip()
+    venue = (row.get("venue") or "").lower()
+    if not venue:
+        return "Other"
+    for domain, keywords in VENUE_RULES:
+        if any(kw in venue for kw in keywords):
+            return domain
+    return "Other"
+
+
+def plot_domain_treemap(df: pd.DataFrame, out: Path, label: str) -> None:
+    """Treemap of paper domains for the last 5 calendar years. News excluded."""
+    current_year = date.today().year
+    window = (current_year - 4, current_year)
+    scholarly = df[~is_news(df)].copy()
+    recent = scholarly[scholarly["year"].between(*window)].copy()
+    if recent.empty:
+        print(f"Skipping {out.name}: no scholarly records in {window[0]}–{window[1]}")
+        return
+
+    recent["domain"] = recent.apply(assign_domain, axis=1)
+    counts = recent["domain"].value_counts()
+    total = int(counts.sum())
+
+    cmap = plt.get_cmap("tab20")
+    colors = [cmap(i % cmap.N) for i in range(len(counts))]
+    labels = [
+        f"{name}\n{n} ({n / total:.0%})" for name, n in counts.items()
+    ]
+
+    fig, ax = plt.subplots(figsize=(11, 6.5))
+    squarify.plot(
+        sizes=counts.values, label=labels, color=colors,
+        alpha=0.85, ax=ax, pad=True,
+        text_kwargs={"fontsize": 10, "color": "black"},
+    )
+    ax.set_title(
+        f"Domains of {label} research papers, {window[0]}–{window[1]} "
+        f"(n={total})"
+    )
+    ax.axis("off")
+    fig.tight_layout()
+    fig.savefig(out, dpi=150)
+    plt.close(fig)
+    print(f"Wrote {out}")
+
+
 def plot_cumulative(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index().cumsum()
     fig, ax = plt.subplots(figsize=(9, 5))
@@ -194,6 +290,7 @@ def write_results(df: pd.DataFrame, out_dir: Path, label: str, has_citations: bo
     plot_papers_per_year(df, out_dir / "papers_per_year.png", label)
     plot_papers_per_year_line(df, out_dir / "papers_per_year_line.png", label)
     plot_cumulative(df, out_dir / "cumulative_papers.png", label)
+    plot_domain_treemap(df, out_dir / "domain_treemap.png", label)
     if has_citations:
         plot_citations_per_year(df, out_dir / "citations_per_year.png", label)
         plot_combined(df, out_dir / "papers_and_citations.png", label)
