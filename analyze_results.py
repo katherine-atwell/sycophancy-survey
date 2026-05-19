@@ -1,31 +1,40 @@
 """
-Analyze the merged paper dataset.
+Analyze a merged paper dataset.
 
-Reads data/merged.csv (produced by merge_data.py) and writes:
+Reads data/<corpus>/merged.csv (produced by merge_data.py) and writes
+summary + plots into results/<corpus>/. With --include-news, also reads
+data/<corpus>/merged_with_news.csv and produces two additional result
+sets:
+  results/<corpus>/with-news/   — scholarly + news combined
+  results/<corpus>/news-only/   — news rows only
+
+Outputs in each result dir:
   - summary.txt: counts, top venues, top-cited papers
   - papers_per_year.png: bar chart of papers published per year
   - citations_per_year.png: total citations of papers published per year
   - cumulative_papers.png: cumulative paper count over time
 
 Run:
-    python analyze_results.py
+    python analyze_results.py                          # default: ai-sycophancy
+    python analyze_results.py --corpus sycophancy
+    python analyze_results.py --include-news
 """
 
+import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.ticker import MultipleLocator
 
 HERE = Path(__file__).parent
-DATABASE = "merged"
-RESULTS_PATH = HERE / "data" / "merged.csv"
-OUT_DIR = HERE / "results" / DATABASE
+CORPORA = ("ai-sycophancy", "sycophancy")
 
 
-def load() -> pd.DataFrame:
-    if not RESULTS_PATH.exists():
-        raise SystemExit(f"missing {RESULTS_PATH} — run merge_data.py first")
-    df = pd.read_csv(RESULTS_PATH, dtype=str, keep_default_na=False)
+def load(results_path: Path) -> pd.DataFrame:
+    if not results_path.exists():
+        raise SystemExit(f"missing {results_path} — run merge_data.py first")
+    df = pd.read_csv(results_path, dtype=str, keep_default_na=False)
     # Coerce types and drop rows with no year (can't plot them).
     df["year"] = pd.to_numeric(df["year"], errors="coerce")
     df["citation_count"] = pd.to_numeric(df["citation_count"], errors="coerce").fillna(0).astype(int)
@@ -34,25 +43,32 @@ def load() -> pd.DataFrame:
     return df
 
 
-def filter_strict(df: pd.DataFrame) -> pd.DataFrame:
-    """Keep only papers where 'sycophan' literally appears in title or abstract.
+def is_news(df: pd.DataFrame) -> pd.Series:
+    return df["sources"].fillna("").str.contains("news", case=False)
 
-    The S2 bulk-search matcher is fuzzy, so this trims false positives.
+
+def filter_strict(df: pd.DataFrame) -> pd.DataFrame:
+    """Keep papers where 'sycophan' literally appears in title or abstract.
+
+    The S2 bulk-search matcher is fuzzy, so this trims false positives. News
+    rows are spared — they came from a topic-targeted library search rather
+    than a fuzzy keyword match, and their abstracts are usually empty.
     """
     text = (df["title"].fillna("") + " " + df["abstract"].fillna("")).str.lower()
-    keep = text.str.contains("sycophan", regex=False)
+    keep = text.str.contains("sycophan", regex=False) | is_news(df)
     dropped = (~keep).sum()
     if dropped:
         print(f"Dropping {dropped} records that don't literally mention 'sycophan*' in title/abstract")
     return df[keep].copy()
 
 
-def write_summary(df: pd.DataFrame, out: Path) -> None:
+def write_summary(df: pd.DataFrame, out: Path, has_citations: bool = True) -> None:
     lines: list[str] = []
     lines.append(f"Total papers: {len(df)}")
     lines.append(f"Year range: {df['year'].min()}–{df['year'].max()}")
-    lines.append(f"Total citations across all papers: {df['citation_count'].sum()}")
-    lines.append(f"Median citations: {df['citation_count'].median():.1f}")
+    if has_citations:
+        lines.append(f"Total citations across all papers: {df['citation_count'].sum()}")
+        lines.append(f"Median citations: {df['citation_count'].median():.1f}")
     lines.append("")
 
     lines.append("Papers per year:")
@@ -66,24 +82,25 @@ def write_summary(df: pd.DataFrame, out: Path) -> None:
             lines.append(f"  {n:>3}  {v}")
     lines.append("")
 
-    lines.append("Top 20 most-cited papers:")
-    top = df.sort_values("citation_count", ascending=False).head(20)
-    for _, row in top.iterrows():
-        lines.append(f"  [{row['citation_count']:>4} cites, {row['year']}] {row['title']}")
-        if row.get("doi"):
-            lines.append(f"        doi: {row['doi']}")
+    if has_citations:
+        lines.append("Top 20 most-cited papers:")
+        top = df.sort_values("citation_count", ascending=False).head(20)
+        for _, row in top.iterrows():
+            lines.append(f"  [{row['citation_count']:>4} cites, {row['year']}] {row['title']}")
+            if row.get("doi"):
+                lines.append(f"        doi: {row['doi']}")
 
     out.write_text("\n".join(lines))
     print(f"Wrote {out}")
 
 
-def plot_papers_per_year(df: pd.DataFrame, out: Path) -> None:
+def plot_papers_per_year(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index()
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.bar(counts.index, counts.values, color="#3b6fb6")
     ax.set_xlabel("Year")
     ax.set_ylabel("Papers")
-    ax.set_title("Papers mentioning AI sycophancy per year")
+    ax.set_title(f"Papers mentioning {label} per year")
     ax.set_xticks(counts.index)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
@@ -92,15 +109,15 @@ def plot_papers_per_year(df: pd.DataFrame, out: Path) -> None:
     print(f"Wrote {out}")
 
 
-def plot_papers_per_year_line(df: pd.DataFrame, out: Path) -> None:
+def plot_papers_per_year_line(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index()
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(counts.index, counts.values, marker="o", color="#3b6fb6", linewidth=2)
     ax.fill_between(counts.index, counts.values, alpha=0.15, color="#3b6fb6")
     ax.set_xlabel("Year")
     ax.set_ylabel("Papers")
-    ax.set_title("Papers mentioning AI sycophancy per year")
-    ax.set_xticks(counts.index)
+    ax.set_title(f"Papers mentioning {label} per year")
+    ax.xaxis.set_major_locator(MultipleLocator(10))
     ax.grid(True, alpha=0.3)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
@@ -109,13 +126,13 @@ def plot_papers_per_year_line(df: pd.DataFrame, out: Path) -> None:
     print(f"Wrote {out}")
 
 
-def plot_citations_per_year(df: pd.DataFrame, out: Path) -> None:
+def plot_citations_per_year(df: pd.DataFrame, out: Path, label: str) -> None:
     cites = df.groupby("year")["citation_count"].sum().sort_index()
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.bar(cites.index, cites.values, color="#c2511f")
     ax.set_xlabel("Publication year")
     ax.set_ylabel("Total citations (as of scrape date)")
-    ax.set_title("Citations to AI-sycophancy papers, by publication year")
+    ax.set_title(f"Citations to {label} papers, by publication year")
     ax.set_xticks(cites.index)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
@@ -124,7 +141,7 @@ def plot_citations_per_year(df: pd.DataFrame, out: Path) -> None:
     print(f"Wrote {out}")
 
 
-def plot_combined(df: pd.DataFrame, out: Path) -> None:
+def plot_combined(df: pd.DataFrame, out: Path, label: str) -> None:
     """Papers (bars) and citations (line) on the same time axis."""
     by_year = df.groupby("year").agg(papers=("title", "count"),
                                      citations=("citation_count", "sum")).sort_index()
@@ -141,21 +158,21 @@ def plot_combined(df: pd.DataFrame, out: Path) -> None:
     ax2.set_ylabel("Total citations", color="#c2511f")
     ax2.tick_params(axis="y", labelcolor="#c2511f")
 
-    ax1.set_title("AI sycophancy: papers and citations over time")
+    ax1.set_title(f"{label}: papers and citations over time")
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
     print(f"Wrote {out}")
 
 
-def plot_cumulative(df: pd.DataFrame, out: Path) -> None:
+def plot_cumulative(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index().cumsum()
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(counts.index, counts.values, marker="o", color="#2a8c5b")
     ax.fill_between(counts.index, counts.values, alpha=0.2, color="#2a8c5b")
     ax.set_xlabel("Year")
     ax.set_ylabel("Cumulative papers")
-    ax.set_title("Cumulative AI sycophancy papers over time")
+    ax.set_title(f"Cumulative {label} papers over time")
     ax.set_xticks(counts.index)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
@@ -164,18 +181,61 @@ def plot_cumulative(df: pd.DataFrame, out: Path) -> None:
     print(f"Wrote {out}")
 
 
+CORPUS_LABELS = {
+    "ai-sycophancy": "AI sycophancy",
+    "sycophancy": "sycophancy",
+}
+
+
+def write_results(df: pd.DataFrame, out_dir: Path, label: str, has_citations: bool = True) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    print(f"\nWriting outputs to {out_dir}\n")
+    write_summary(df, out_dir / "summary.txt", has_citations)
+    plot_papers_per_year(df, out_dir / "papers_per_year.png", label)
+    plot_papers_per_year_line(df, out_dir / "papers_per_year_line.png", label)
+    plot_cumulative(df, out_dir / "cumulative_papers.png", label)
+    if has_citations:
+        plot_citations_per_year(df, out_dir / "citations_per_year.png", label)
+        plot_combined(df, out_dir / "papers_and_citations.png", label)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
+    parser.add_argument(
+        "--corpus",
+        choices=CORPORA,
+        default="ai-sycophancy",
+        help="which corpus to analyze (default: ai-sycophancy)",
+    )
+    parser.add_argument(
+        "--include-news",
+        action="store_true",
+        help="also produce with-news/ and news-only/ result sets from "
+             "data/<corpus>/merged_with_news.csv",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    df = load()
-    print(f"Loaded {len(df)} records with year info")
+    args = parse_args()
+    corpus_dir = HERE / "data" / args.corpus
+    results_root = HERE / "results" / args.corpus
+    label = CORPUS_LABELS[args.corpus]
+
+    df = load(corpus_dir / "merged.csv")
+    print(f"Loaded {len(df)} scholarly records with year info")
     df = filter_strict(df)
-    print(f"{len(df)} after strict filter\n")
+    print(f"{len(df)} after strict filter")
+    write_results(df, results_root, label)
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"Writing outputs to {OUT_DIR}\n")
+    if args.include_news:
+        df_all = load(corpus_dir / "merged_with_news.csv")
+        print(f"\nLoaded {len(df_all)} scholarly+news records with year info")
+        df_all = filter_strict(df_all)
+        print(f"{len(df_all)} after strict filter (news rows spared)")
+        write_results(df_all, results_root / "with-news", f"{label} (incl. news)")
 
-    write_summary(df, OUT_DIR / "summary.txt")
-    plot_papers_per_year(df, OUT_DIR / "papers_per_year.png")
-    plot_papers_per_year_line(df, OUT_DIR / "papers_per_year_line.png")
-    plot_citations_per_year(df, OUT_DIR / "citations_per_year.png")
-    plot_combined(df, OUT_DIR / "papers_and_citations.png")
-    plot_cumulative(df, OUT_DIR / "cumulative_papers.png")
+        df_news = df_all[is_news(df_all)].copy()
+        print(f"\n{len(df_news)} news-only records")
+        write_results(df_news, results_root / "news-only", f"{label} in news media",
+                      has_citations=False)

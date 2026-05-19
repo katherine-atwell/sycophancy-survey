@@ -1,5 +1,5 @@
 """
-Check data/merged.csv for duplicate titles.
+Check data/<corpus>/merged.csv for duplicate titles.
 
 Two records are flagged as duplicates if their titles match after light
 normalization (lowercased, accents stripped, punctuation removed, whitespace
@@ -11,17 +11,19 @@ Exit code is non-zero if any duplicates are found, so this can be wired into
 CI as a regression check after re-merging.
 
 Run:
-    python test_duplicate_titles.py
+    python test_duplicate_titles.py                       # default: ai-sycophancy
+    python test_duplicate_titles.py --corpus sycophancy
 """
 
+import argparse
 import csv
 import sys
 from collections import defaultdict
 from pathlib import Path
 
-from merge_data import norm_text
+from merge_data import CORPORA, norm_text
 
-MERGED_CSV = Path(__file__).parent / "data" / "merged.csv"
+DATA_ROOT = Path(__file__).parent / "data"
 
 
 def find_duplicate_titles(rows: list[dict]) -> dict[str, list[dict]]:
@@ -33,17 +35,30 @@ def find_duplicate_titles(rows: list[dict]) -> dict[str, list[dict]]:
     return {k: v for k, v in groups.items() if len(v) > 1}
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
+    parser.add_argument(
+        "--corpus",
+        choices=CORPORA,
+        default="ai-sycophancy",
+        help="which corpus to check (default: ai-sycophancy)",
+    )
+    return parser.parse_args()
+
+
 def main() -> int:
-    if not MERGED_CSV.exists():
-        print(f"missing {MERGED_CSV} — run merge_data.py first", file=sys.stderr)
+    args = parse_args()
+    merged_csv = DATA_ROOT / args.corpus / "merged.csv"
+    if not merged_csv.exists():
+        print(f"missing {merged_csv} — run merge_data.py first", file=sys.stderr)
         return 2
 
-    with MERGED_CSV.open(encoding="utf-8") as f:
+    with merged_csv.open(encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
 
     dupes = find_duplicate_titles(rows)
 
-    print(f"Loaded {len(rows)} records from {MERGED_CSV.name}")
+    print(f"Loaded {len(rows)} records from {merged_csv}")
     if not dupes:
         print("No duplicate titles found.")
         return 0

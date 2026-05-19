@@ -1,13 +1,19 @@
 """
-Scrape Web of Science for articles about AI sycophancy.
+Scrape Web of Science for articles about sycophancy.
+
+Two corpora are supported:
+  - ai-sycophancy: sycophancy co-occurring with AI/LLM/etc. (the original query)
+  - sycophancy:    every paper mentioning sycophancy, no AI restriction
 
 Uses the WoS Starter API. Set WOS_API_KEY in your environment before running:
     export WOS_API_KEY="your-key-here"
-    python scrape_wos.py
+    python scrape_wos.py                       # default: ai-sycophancy
+    python scrape_wos.py --corpus sycophancy
 
-Output: results saved to wos_results.json and wos_results.csv
+Output: data/<corpus>/wos_results.json and data/<corpus>/wos_results.csv
 """
 
+import argparse
 import csv
 import json
 import os
@@ -38,14 +44,18 @@ AI_TERMS = [
     "language model",
 ]
 
-# Build a TS= (Topic = title/abstract/keywords/keywords-plus) query.
+# TS= (Topic = title/abstract/keywords/keywords-plus) queries.
 # The phrase clauses ("AI sycophancy", etc.) are technically subsumed by
 # the (AI_TERMS) AND sycophancy clause, but kept explicit for clarity.
-ai_clause = " OR ".join(f'"{t}"' for t in AI_TERMS)
-QUERY = (
-    f'TS=("AI sycophancy" OR "LLM sycophancy" '
-    f"OR (({ai_clause}) AND sycophancy))"
-)
+_ai_clause = " OR ".join(f'"{t}"' for t in AI_TERMS)
+
+QUERIES = {
+    "ai-sycophancy": (
+        f'TS=("AI sycophancy" OR "LLM sycophancy" '
+        f"OR (({_ai_clause}) AND sycophancy))"
+    ),
+    "sycophancy": 'TS=(sycophancy OR sycophantic OR sycophant)',
+}
 
 
 @retry(stop=stop_after_attempt(5), wait=wait_exponential(min=2, max=30))
@@ -91,16 +101,16 @@ def extract_record(hit: dict) -> dict:
     }
 
 
-def scrape_all() -> list[dict]:
+def scrape_all(query: str) -> list[dict]:
     if not API_KEY:
         sys.exit("ERROR: set WOS_API_KEY in your environment before running.")
 
-    print(f"Query: {QUERY}\n")
+    print(f"Query: {query}\n")
     all_records: list[dict] = []
     page = 1
     while True:
         print(f"Fetching page {page}...")
-        data = fetch_page(QUERY, page)
+        data = fetch_page(query, page)
         hits = data.get("hits", []) or []
         if not hits:
             break
@@ -118,7 +128,7 @@ def scrape_all() -> list[dict]:
 
 
 def save(records: list[dict], out_dir: Path) -> None:
-    out_dir.mkdir(exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
     json_path = out_dir / "wos_results.json"
     csv_path = out_dir / "wos_results.csv"
 
@@ -133,7 +143,19 @@ def save(records: list[dict], out_dir: Path) -> None:
         print(f"Wrote {csv_path}")
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
+    parser.add_argument(
+        "--corpus",
+        choices=sorted(QUERIES),
+        default="ai-sycophancy",
+        help="which query/corpus to scrape (default: ai-sycophancy)",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    records = scrape_all()
+    args = parse_args()
+    records = scrape_all(QUERIES[args.corpus])
     print(f"\nTotal records: {len(records)}")
-    save(records, Path(__file__).parent)
+    save(records, Path(__file__).parent / "data" / args.corpus)

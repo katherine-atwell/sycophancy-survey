@@ -1,0 +1,97 @@
+Total papers: 610
+Year range: 1863–2026
+Total citations across all papers: 6563
+Median citations: 1.0
+
+Papers per year:
+  1863: 1
+  1920: 1
+  1971: 1
+  1976: 1
+  1979: 1
+  1980: 1
+  1981: 1
+  1985: 1
+  1986: 1
+  1988: 2
+  1989: 2
+  1990: 1
+  1991: 1
+  1992: 3
+  1993: 4
+  1995: 1
+  1997: 2
+  1999: 1
+  2000: 2
+  2001: 1
+  2002: 2
+  2003: 4
+  2004: 7
+  2005: 2
+  2006: 5
+  2007: 5
+  2008: 1
+  2009: 5
+  2010: 4
+  2011: 2
+  2012: 8
+  2013: 8
+  2014: 5
+  2015: 7
+  2016: 5
+  2017: 10
+  2018: 23
+  2019: 14
+  2020: 5
+  2021: 14
+  2022: 16
+  2023: 24
+  2024: 51
+  2025: 146
+  2026: 208
+
+Top 15 venues:
+  148  arXiv.org
+   12  Conference on Empirical Methods in Natural Language Processing
+    6  Proceedings of the 2026 CHI Conference on Human Factors in Computing Systems
+    6  Social Science Research Network
+    5  COMMUNICATION RESEARCH REPORTS
+    5  International Conference on Learning Representations
+    3  Nature
+    3  North American Chapter of the Association for Computational Linguistics
+    3  COMMUNICATION EDUCATION
+    3  Proceedings of the AAAI/ACM Conference on AI, Ethics, and Society
+    3  Conference of the European Chapter of the Association for Computational Linguistics
+    3  Annual Meeting of the Association for Computational Linguistics
+    3  npj Digital Medicine
+    3  Proceedings of the Extended Abstracts of the 2026 CHI Conference on Human Factors in Computing Systems
+
+Top 20 most-cited papers:
+  [ 795 cites, 2023] Towards Understanding Sycophancy in Language Models
+  [ 773 cites, 2022] Discovering Language Model Behaviors with Model-Written Evaluations
+  [ 388 cites, 1997] Silicon sycophants: the effects of computers that flatter
+        doi: 10.1006/ijhc.1996.0104
+  [ 357 cites, 2025] OpenAI GPT-5 System Card
+  [ 225 cites, 2004] Sifarish, Sycophants, Power and Collectivism: Administrative Culture in Pakistan
+        doi: 10.1177/0020852304044259
+  [ 182 cites, 2025] Persona Vectors: Monitoring and Controlling Character Traits in Language Models
+  [ 173 cites, 1999] Students’ motives for communicating with their instructors
+        doi: 10.1080/03634529909379163
+  [ 159 cites, 2025] Expressing stigma and inappropriate responses prevents LLMs from safely replacing mental health providers.
+        doi: 10.1145/3715275.3732039
+  [ 141 cites, 2023] Simple synthetic data reduces sycophancy in large language models
+  [ 116 cites, 2024] Sycophancy to Subterfuge: Investigating Reward-Tampering in Large Language Models
+  [ 113 cites, 2009] The Development and Validation of the Student Communication Satisfaction Scale
+        doi: 10.1080/03634520902755441
+  [ 108 cites, 2024] Sycophancy in Large Language Models: Causes and Mitigations
+        doi: 10.1007/978-3-031-92611-2_5
+  [ 103 cites, 2009] The Relation Between Teacher Self-Disclosure and Student Motives to Communicate
+        doi: 10.1080/08824090902861523
+  [  95 cites, 2024] O1 Replication Journey - Part 2: Surpassing O1-preview through Simple Distillation, Big Progress or Bitter Lesson?
+  [  91 cites, 2023] System 2 Attention (is something you might need too)
+  [  91 cites, 2025] SycEval: Evaluating LLM Sycophancy
+  [  89 cites, 2023] How to Catch an AI Liar: Lie Detection in Black-Box LLMs by Asking Unrelated Questions
+  [  73 cites, 2004] Monkey Business: Imitation, Authenticity, and Identity from Pithekoussai to Plautus
+        doi: 10.1525/ca.2004.23.2.179
+  [  71 cites, 2023] When Large Language Models contradict humans? Large Language Models' Sycophantic Behaviour
+  [  60 cites, 2023] Are You Sure? Challenging LLMs Leads to Performance Drops in The FlipFlop Experiment

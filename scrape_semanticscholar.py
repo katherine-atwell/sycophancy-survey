@@ -1,5 +1,9 @@
 """
-Scrape Semantic Scholar for articles about AI sycophancy.
+Scrape Semantic Scholar for articles about sycophancy.
+
+Two corpora are supported:
+  - ai-sycophancy: sycophancy co-occurring with AI/LLM/etc. (the original query)
+  - sycophancy:    every paper mentioning sycophancy, no AI restriction
 
 Uses the Graph API bulk search endpoint, which supports boolean operators
 and returns up to 1000 papers per page (with continuation tokens).
@@ -8,11 +12,13 @@ No API key required. If you have one, set it for higher rate limits:
     export S2_API_KEY="your-key-here"
 
 Run:
-    python scrape_semanticscholar.py
+    python scrape_semanticscholar.py                       # default: ai-sycophancy
+    python scrape_semanticscholar.py --corpus sycophancy
 
-Output: s2_results.json and s2_results.csv
+Output: data/<corpus>/s2_results.json and data/<corpus>/s2_results.csv
 """
 
+import argparse
 import csv
 import json
 import os
@@ -41,11 +47,15 @@ AI_TERMS = [
     '"language models"',
     '"language model"',
 ]
-ai_clause = " | ".join(AI_TERMS)
-QUERY = (
-    f'"AI sycophancy" | "LLM sycophancy" | '
-    f"(({ai_clause}) + sycophancy)"
-)
+_ai_clause = " | ".join(AI_TERMS)
+
+QUERIES = {
+    "ai-sycophancy": (
+        f'"AI sycophancy" | "LLM sycophancy" | '
+        f"(({_ai_clause}) + sycophancy)"
+    ),
+    "sycophancy": "sycophancy | sycophantic | sycophant",
+}
 
 FIELDS = ",".join([
     "paperId",
@@ -112,15 +122,15 @@ def extract_record(p: dict) -> dict:
     }
 
 
-def scrape_all() -> list[dict]:
-    print(f"Query: {QUERY}\n")
+def scrape_all(query: str) -> list[dict]:
+    print(f"Query: {query}\n")
     all_records: list[dict] = []
     token: str | None = None
     page = 0
     while True:
         page += 1
         print(f"Fetching page {page}" + (f" (token={token[:12]}...)" if token else "") + "...")
-        data = fetch_page(QUERY, token)
+        data = fetch_page(query, token)
         papers = data.get("data") or []
         total = data.get("total", 0)
         all_records.extend(extract_record(p) for p in papers)
@@ -135,7 +145,7 @@ def scrape_all() -> list[dict]:
 
 
 def save(records: list[dict], out_dir: Path) -> None:
-    out_dir.mkdir(exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
     json_path = out_dir / "s2_results.json"
     csv_path = out_dir / "s2_results.csv"
 
@@ -150,9 +160,21 @@ def save(records: list[dict], out_dir: Path) -> None:
         print(f"Wrote {csv_path}")
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
+    parser.add_argument(
+        "--corpus",
+        choices=sorted(QUERIES),
+        default="ai-sycophancy",
+        help="which query/corpus to scrape (default: ai-sycophancy)",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    args = parse_args()
     if not API_KEY:
         print("(no S2_API_KEY set — running unauthenticated, rate limit is lower)\n")
-    records = scrape_all()
+    records = scrape_all(QUERIES[args.corpus])
     print(f"\nTotal records: {len(records)}")
-    save(records, Path(__file__).parent / "data")
+    save(records, Path(__file__).parent / "data" / args.corpus)

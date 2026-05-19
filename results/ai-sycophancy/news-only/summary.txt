@@ -1,0 +1,90 @@
+Total papers: 527
+Year range: 1817–2026
+
+Papers per year:
+  1817: 1
+  1829: 1
+  1831: 2
+  1832: 2
+  1836: 1
+  1844: 1
+  1845: 1
+  1847: 1
+  1849: 3
+  1852: 1
+  1853: 1
+  1854: 1
+  1856: 1
+  1857: 1
+  1858: 1
+  1859: 2
+  1861: 1
+  1867: 1
+  1870: 1
+  1872: 1
+  1882: 1
+  1886: 1
+  1900: 2
+  1901: 1
+  1905: 1
+  1917: 1
+  1921: 1
+  1925: 1
+  1926: 1
+  1950: 1
+  1952: 1
+  1956: 1
+  1960: 2
+  1964: 2
+  1975: 1
+  1979: 7
+  1980: 2
+  1981: 1
+  1982: 3
+  1984: 1
+  1986: 2
+  1987: 1
+  1988: 2
+  1989: 1
+  1991: 1
+  1992: 1
+  1994: 1
+  1995: 4
+  1996: 3
+  1997: 2
+  1998: 2
+  1999: 2
+  2000: 2
+  2004: 1
+  2005: 2
+  2007: 2
+  2011: 2
+  2012: 2
+  2013: 2
+  2015: 1
+  2017: 1
+  2018: 5
+  2019: 2
+  2021: 2
+  2022: 4
+  2023: 10
+  2024: 24
+  2025: 254
+  2026: 132
+
+Top 15 venues:
+   28  Dow Jones Institutional News
+   26  News Bites - Private Companies
+   24  The Wall Street journal. Eastern edition
+   24  The New York times
+   24  CE Noticias Financieras
+   21  Mint (New Delhi, India)
+   21  The New York Times (Digital Edition)
+   19  The Times of India (1861-)
+   16  FT.com
+   16  Targeted News Service
+   15  The Economist (London)
+   13  The Financial times (London ed.)
+   12  University Wire
+   11  MIT Technology Review.com
+   10  New York Times (Online)

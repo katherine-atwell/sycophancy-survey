@@ -1,5 +1,5 @@
 """
-Merge all .csv and .tsv files in data/ into a single deduplicated dataset.
+Merge all .csv and .tsv files in data/<corpus>/ into a single deduplicated dataset.
 
 Matches papers across sources using (in order):
   1. DOI (lowercased)
@@ -16,16 +16,22 @@ are merged here, that test only flags collisions this script *missed*.
 When two records match, fields are merged: non-empty values win, longer
 abstracts win, and IDs from each source are preserved.
 
-Output: data/merged.csv and data/merged.json
+Run:
+    python merge_data.py                       # default: ai-sycophancy
+    python merge_data.py --corpus sycophancy
+
+Output: data/<corpus>/merged.csv and data/<corpus>/merged.json
 """
 
+import argparse
 import csv
 import json
 import re
 import unicodedata
 from pathlib import Path
 
-DATA_DIR = Path(__file__).parent / "data"
+DATA_ROOT = Path(__file__).parent / "data"
+CORPORA = ("ai-sycophancy", "sycophancy")
 OUTPUT_BASENAME = "merged"
 
 # Unified output schema. Order is the CSV column order.
@@ -203,12 +209,88 @@ def load_generic_csv(path: Path, delimiter: str) -> list[dict]:
     return out
 
 
+NEWS_FILENAME_RE = re.compile(r"news|magazine|newspaper|onesearch", re.IGNORECASE)
+
+
+def is_news_file(path: Path) -> bool:
+    return bool(NEWS_FILENAME_RE.search(path.stem))
+
+
+# Patterns tried in order to pull a year (and date when available) out of
+# the messy "Is Part Of" strings OneSearch produces, e.g.
+#   "The Wall Street journal. Eastern edition, 2025-06-30"
+#   "The Bombay Times and Journal of Commerce (1838-1859), 1856-10-11, p.653"
+_DATE_ISO = re.compile(r"(\d{4})-(\d{1,2})-(\d{1,2})")
+_DATE_YM = re.compile(r"(\d{4})-(\d{1,2})\b")
+_DATE_COMMA_YEAR = re.compile(r",\s*(\d{4})\b")
+_DATE_BARE_YEAR = re.compile(r"\b(1[6-9]\d{2}|20\d{2}|21\d{2})\b")
+
+
+def extract_date(text: str) -> tuple[str, str]:
+    """Return (year, publication_date). publication_date is ISO when possible."""
+    if not text:
+        return "", ""
+    m = _DATE_ISO.search(text)
+    if m:
+        y, mo, d = m.group(1), m.group(2).zfill(2), m.group(3).zfill(2)
+        return y, f"{y}-{mo}-{d}"
+    m = _DATE_YM.search(text)
+    if m:
+        y, mo = m.group(1), m.group(2).zfill(2)
+        return y, f"{y}-{mo}"
+    m = _DATE_COMMA_YEAR.search(text) or _DATE_BARE_YEAR.search(text)
+    return (m.group(1), "") if m else ("", "")
+
+
+def _strip_trailing_date(text: str) -> str:
+    return re.sub(r",\s*\d{4}(-\d{1,2})?(-\d{1,2})?.*$", "", text).strip()
+
+
+def load_news_csv(path: Path) -> list[dict]:
+    """Load a OneSearch-style newspaper/magazine export (ProQuest/Primo)."""
+    with path.open(encoding="utf-8-sig") as f:
+        rows = list(csv.DictReader(f))
+    out = []
+    for r in rows:
+        ipo = (r.get("Is Part Of") or "").strip()
+        cd = (r.get("Creation Date") or "").strip()
+        year, pubdate = extract_date(cd or ipo)
+        venue = _strip_trailing_date(ipo) or (r.get("Publisher") or "").strip()
+        authors = "; ".join(
+            a.strip() for a in (r.get("Author", ""), r.get("Contributor", ""))
+            if a and a.strip()
+        )
+        out.append({
+            "title": (r.get("Title") or "").strip(),
+            "authors": authors,
+            "year": year,
+            "publication_date": pubdate,
+            "venue": venue,
+            "doi": "",
+            "arxiv_id": "",
+            "pubmed_id": "",
+            "wos_id": "",
+            "s2_paper_id": "",
+            "abstract": (r.get("Description") or "").strip(),
+            "citation_count": "",
+            "publication_types": "news",
+            "fields_of_study": "",
+            "keywords": (r.get("Subjects") or "").strip(),
+            "url": (r.get("permalink") or "").strip(),
+            "open_access_pdf": "",
+            "sources": "news",
+        })
+    return out
+
+
 def detect_and_load(path: Path) -> list[dict]:
     name = path.name.lower()
     if name.startswith("s2_results") and path.suffix == ".csv":
         return load_s2_csv(path)
     if name == "wos.tsv":
         return load_wos_tsv(path)
+    if is_news_file(path):
+        return load_news_csv(path)
     delim = "\t" if path.suffix == ".tsv" else ","
     return load_generic_csv(path, delim)
 
@@ -270,39 +352,58 @@ def dedupe(records: list[dict]) -> list[dict]:
     return out
 
 
-def main() -> None:
-    if not DATA_DIR.is_dir():
-        raise SystemExit(f"data dir not found: {DATA_DIR}")
-
-    files = sorted(
-        p for p in DATA_DIR.iterdir()
-        if p.suffix.lower() in (".csv", ".tsv") and not p.stem.startswith(OUTPUT_BASENAME)
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
+    parser.add_argument(
+        "--corpus",
+        choices=CORPORA,
+        default="ai-sycophancy",
+        help="which corpus subfolder under data/ to merge (default: ai-sycophancy)",
     )
-    if not files:
-        raise SystemExit(f"no .csv or .tsv files in {DATA_DIR}")
+    return parser.parse_args()
 
-    all_records: list[dict] = []
-    for path in files:
-        records = detect_and_load(path)
-        print(f"  {path.name}: {len(records)} records")
-        all_records.extend(records)
 
-    print(f"\nTotal before dedup: {len(all_records)}")
-    deduped = dedupe(all_records)
-    print(f"Total after dedup:  {len(deduped)}")
+def write_merged(records: list[dict], data_dir: Path, basename: str) -> None:
+    print(f"\n{basename}: {len(records)} records before dedup")
+    deduped = dedupe(records)
+    print(f"{basename}: {len(deduped)} records after dedup")
 
-    out_csv = DATA_DIR / f"{OUTPUT_BASENAME}.csv"
-    out_json = DATA_DIR / f"{OUTPUT_BASENAME}.json"
-
+    out_csv = data_dir / f"{basename}.csv"
+    out_json = data_dir / f"{basename}.json"
     with out_csv.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=UNIFIED_FIELDS)
         writer.writeheader()
         for rec in deduped:
             writer.writerow({k: rec.get(k, "") for k in UNIFIED_FIELDS})
     print(f"Wrote {out_csv}")
-
     out_json.write_text(json.dumps(deduped, indent=2, ensure_ascii=False))
     print(f"Wrote {out_json}")
+
+
+def main() -> None:
+    args = parse_args()
+    data_dir = DATA_ROOT / args.corpus
+    if not data_dir.is_dir():
+        raise SystemExit(f"data dir not found: {data_dir}")
+
+    files = sorted(
+        p for p in data_dir.iterdir()
+        if p.suffix.lower() in (".csv", ".tsv") and not p.stem.startswith(OUTPUT_BASENAME)
+    )
+    if not files:
+        raise SystemExit(f"no .csv or .tsv files in {data_dir}")
+
+    scholarly: list[dict] = []
+    news: list[dict] = []
+    for path in files:
+        records = detect_and_load(path)
+        bucket = "news" if is_news_file(path) else "scholarly"
+        print(f"  [{bucket}] {path.name}: {len(records)} records")
+        (news if bucket == "news" else scholarly).extend(records)
+
+    write_merged(scholarly, data_dir, OUTPUT_BASENAME)
+    if news:
+        write_merged(scholarly + news, data_dir, f"{OUTPUT_BASENAME}_with_news")
 
 
 if __name__ == "__main__":

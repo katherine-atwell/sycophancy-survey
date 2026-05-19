@@ -1,0 +1,123 @@
+Total papers: 871
+Year range: 1817–2027
+Total citations across all papers: 3937
+Median citations: 0.0
+
+Papers per year:
+  1817: 1
+  1829: 1
+  1831: 2
+  1832: 2
+  1836: 1
+  1844: 1
+  1845: 1
+  1847: 1
+  1849: 3
+  1852: 1
+  1853: 1
+  1854: 1
+  1856: 1
+  1857: 1
+  1858: 1
+  1859: 2
+  1861: 1
+  1867: 1
+  1870: 1
+  1872: 1
+  1882: 1
+  1886: 1
+  1900: 2
+  1901: 1
+  1905: 1
+  1917: 1
+  1921: 1
+  1925: 1
+  1926: 1
+  1950: 1
+  1952: 1
+  1956: 1
+  1960: 2
+  1964: 2
+  1975: 1
+  1979: 7
+  1980: 2
+  1981: 1
+  1982: 3
+  1984: 1
+  1986: 2
+  1987: 1
+  1988: 2
+  1989: 1
+  1991: 1
+  1992: 1
+  1994: 1
+  1995: 4
+  1996: 3
+  1997: 2
+  1998: 2
+  1999: 2
+  2000: 3
+  2004: 1
+  2005: 2
+  2007: 2
+  2011: 2
+  2012: 2
+  2013: 2
+  2015: 2
+  2017: 1
+  2018: 5
+  2019: 2
+  2020: 1
+  2021: 3
+  2022: 5
+  2023: 15
+  2024: 59
+  2025: 393
+  2026: 291
+  2027: 1
+
+Top 15 venues:
+  119  arXiv.org
+   28  Dow Jones Institutional News
+   26  News Bites - Private Companies
+   24  The New York times
+   24  CE Noticias Financieras
+   24  The Wall Street journal. Eastern edition
+   21  The New York Times (Digital Edition)
+   21  Mint (New Delhi, India)
+   19  The Times of India (1861-)
+   16  FT.com
+   16  Targeted News Service
+   15  Zenodo
+   15  The Economist (London)
+   13  The Financial times (London ed.)
+
+Top 20 most-cited papers:
+  [ 763 cites, 2023] Towards Understanding Sycophancy in Language Models
+  [ 760 cites, 2022] Discovering Language Model Behaviors with Model-Written Evaluations
+  [ 171 cites, 2025] Persona Vectors: Monitoring and Controlling Character Traits in Language Models
+  [ 157 cites, 2025] Expressing stigma and inappropriate responses prevents LLMs from safely replacing mental health providers.
+        doi: 10.1145/3715275.3732039
+  [ 138 cites, 2023] Simple synthetic data reduces sycophancy in large language models
+  [ 114 cites, 2024] Sycophancy to Subterfuge: Investigating Reward-Tampering in Large Language Models
+  [ 107 cites, 2024] Sycophancy in Large Language Models: Causes and Mitigations
+        doi: 10.1007/978-3-031-92611-2_5
+  [  94 cites, 2024] O1 Replication Journey - Part 2: Surpassing O1-preview through Simple Distillation, Big Progress or Bitter Lesson?
+  [  91 cites, 2023] System 2 Attention (is something you might need too)
+  [  86 cites, 2025] SycEval: Evaluating LLM Sycophancy
+  [  71 cites, 2023] When Large Language Models contradict humans? Large Language Models' Sycophantic Behaviour
+  [  56 cites, 2024] From Yes-Men to Truth-Tellers: Addressing Sycophancy in Large Language Models with Pinpoint Tuning
+  [  53 cites, 2025] When helpfulness backfires: LLMs and the risk of false medical information due to sycophantic behavior
+        doi: 10.1038/s41746-025-02008-z
+  [  52 cites, 2024] Artificial intelligence and qualitative research: The promise and perils of large language model (LLM) 'assistance'
+        doi: 10.1016/j.cpa.2024.102722
+  [  49 cites, 2025] Measuring Sycophancy of Language Models in Multi-turn Dialogues
+        doi: 10.18653/v1/2025.findings-emnlp.121
+  [  45 cites, 2023] How Trustworthy are Open-Source LLMs? An Assessment under Malicious Demonstrations Shows their Vulnerabilities
+  [  42 cites, 2000] Students' motives for communicating with their instructors and affective and cognitive learning
+        doi: 10.2466/pr0.87.7.830-834
+  [  41 cites, 2025] Be Friendly, Not Friends: How LLM Sycophancy Shapes User Trust
+        doi: 10.1145/3772318.3791079
+  [  32 cites, 2024] Prompt Leakage effect and mitigation strategies for multi-turn LLM Applications
+        doi: 10.18653/v1/2024.emnlp-industry.94
+  [  32 cites, 2024] Monitoring Latent World States in Language Models with Propositional Probes
