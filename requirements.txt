@@ -3,3 +3,4 @@ tenacity>=8.2
 pandas>=2.0
 matplotlib>=3.7
 squarify>=0.4
+anthropic>=0.85
