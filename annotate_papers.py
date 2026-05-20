@@ -1,14 +1,16 @@
 """
 Pseudo-label each paper in a merged.csv with Claude Sonnet.
 
-For each paper (title + abstract) the model returns a JSON object with six
+For each paper (title + abstract) the model returns a JSON object with eight
 fields:
   - "Application area of interest"
   - "Definition of sycophancy"
+  - "Verbatim definition of sycophancy"
   - "How they are measuring sycophancy"
   - "Language models tested"
   - "Tested methods for mitigating sycophancy"
   - "novel evaluation metrics"
+  - "Contribution type"
 
 Empty fields are returned as the literal string "None". Output is JSONL —
 one JSON object per line — written incrementally so a crash or rate-limit
@@ -31,6 +33,7 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+from tqdm import tqdm
 
 import anthropic
 
@@ -41,10 +44,12 @@ MODEL = "claude-sonnet-4-6"
 CATEGORIES = [
     "Application area of interest",
     "Definition of sycophancy",
+    "Verbatim definition of sycophancy",
     "How they are measuring sycophancy",
     "Language models tested",
     "Tested methods for mitigating sycophancy",
     "novel evaluation metrics",
+    "Contribution type",
 ]
 
 SCHEMA = {
@@ -78,7 +83,19 @@ Examples:
 - "Agreement with the user's stated position regardless of its correctness."
 - "Behavior in which a model abandons a correct answer when challenged by the user."
 
-## 3. "How they are measuring sycophancy"
+## 3. "Verbatim definition of sycophancy"
+The paper's definition of sycophancy quoted **word-for-word** from the paper's own text — author wording, not paraphrased. Pull the wording from the abstract or full text where the authors explicitly say what they mean by "sycophancy" / "sycophantic". Preserve their exact words, capitalization, and punctuation inside the quoted spans.
+
+If the definition spans multiple sentences or is long, you may abbreviate by joining non-contiguous spans with " ... " (a space-ellipsis-space). Do not alter wording inside the quoted spans. Keep the entire value under 400 characters.
+
+Return "None" if the paper does not explicitly define sycophancy in its own words (e.g. only mentions the term without defining it).
+
+Examples:
+- "the tendency of LLMs to agree with users even when the user's claim is factually wrong"
+- "We define sycophancy as the propensity of a model to adopt user-stated beliefs at the cost of accuracy."
+- "sycophantic behavior — the inclination to flatter or affirm the user ... emerges as a side effect of RLHF"
+
+## 4. "How they are measuring sycophancy"
 The concrete method, metric, or benchmark the paper uses to measure sycophancy. Be specific. Return "None" if the paper does not directly measure sycophancy (e.g. a pure position paper or survey).
 
 Examples:
@@ -87,7 +104,7 @@ Examples:
 - "Accuracy drop on math problems when the user states a wrong belief."
 - "SycophancyEval benchmark from Sharma et al. (2023)."
 
-## 4. "Language models tested"
+## 5. "Language models tested"
 A comma-separated list of every language model the paper evaluates for sycophancy. Use the model names as the paper refers to them, including size/version when given. Return "None" if the paper does not test specific models (e.g. a position paper, survey, or purely theoretical work).
 
 Examples:
@@ -96,7 +113,7 @@ Examples:
 - "LLaMA-2-7B-Chat, Mistral-7B-Instruct"
 - "GPT-4o"
 
-## 5. "Tested methods for mitigating sycophancy"
+## 6. "Tested methods for mitigating sycophancy"
 Any mitigation technique the paper actually tests: prompt engineering, fine-tuning, RLHF/DPO modifications, activation steering, decoding interventions, system-prompt edits, etc. Be specific. Return "None" if the paper only measures or analyzes sycophancy without testing any mitigation.
 
 Examples:
@@ -105,7 +122,7 @@ Examples:
 - "Adding 'be honest and disagree when warranted' to the system prompt."
 - "DPO with preference pairs that reward disagreement when the user is wrong."
 
-## 6. "novel evaluation metrics"
+## 7. "novel evaluation metrics"
 Any new evaluation metric the paper introduces (not just adopts from prior work). Return "None" if the paper only uses existing metrics.
 
 Examples:
@@ -113,8 +130,29 @@ Examples:
 - "Belief Stability Score under adversarial user pushback."
 - "Flip rate × confidence weighting."
 
+## 8. "Contribution type"
+The primary type(s) of contribution the paper makes. Choose **one or more** labels from this fixed list, copied exactly as written:
+
+- "Survey / Position" — literature review, opinion piece, perspective, position paper, or purely conceptual/theoretical argument
+- "Empirical findings" — new experimental results that characterize, measure, or analyze sycophancy
+- "Novel benchmark" — introduces a new dataset, benchmark, or test suite for evaluating sycophancy
+- "Novel metric" — introduces a new evaluation metric or scoring method for sycophancy
+- "Novel mitigation method" — proposes a new method, intervention, training scheme, or steering technique to reduce sycophancy
+- "Tool / software" — releases a tool, library, framework, or system (independent of empirical work)
+- "Other" — none of the above clearly applies, or the contribution can't be determined from the available text
+
+Pick every label that genuinely applies. Many papers will warrant two labels (e.g. an empirical paper that also introduces a benchmark). Join multiple labels with "; " (semicolon-space). Use the labels exactly as written above — do not invent new labels.
+
+Examples:
+- "Survey / Position"
+- "Empirical findings"
+- "Empirical findings; Novel benchmark"
+- "Empirical findings; Novel mitigation method"
+- "Novel benchmark; Novel metric"
+- "Novel mitigation method; Tool / software"
+
 ## Output rules
-- Return only the JSON object with exactly these six keys.
+- Return only the JSON object with exactly these eight keys.
 - Use the literal string "None" (not null, not an empty string) for categories that do not apply.
 - Keep each value under 200 characters. Be terse and concrete.
 - Base annotations only on what the title, abstract, and (if accessible) full text actually say. If URLs exist, try to access them and read the full article text if information is not in the abstract. Do not invent details.
@@ -150,8 +188,8 @@ def load_existing_keys(path: Path) -> set[str]:
     return keys
 
 
-def annotate_paper(client: anthropic.Anthropic, title: str, abstract: str) -> tuple[dict, anthropic.types.Usage]:
-    user_text = f"Title: {title}\n\nAbstract: {abstract or '(no abstract available — annotate from title alone)'}"
+def annotate_paper(client: anthropic.Anthropic, title: str, abstract: str, url: str) -> tuple[dict, anthropic.types.Usage]:
+    user_text = f"Title: {title}\n\nAbstract: {abstract or '(no abstract available)'}\n\n URL: {url or '(no URL)'}\n\nAnnotate this paper according to the system prompt instructions."
     response = client.messages.create(
         model=MODEL,
         max_tokens=2048,
@@ -212,14 +250,15 @@ def main() -> None:
     n_ok = n_err = 0
 
     with output_path.open("a", encoding="utf-8") as out_f:
-        for i, row in enumerate(todo, 1):
+        for i, row in tqdm(enumerate(todo, 1), total=len(todo)):
             key = paper_key(row)
             title = row.get("title", "").strip()
             abstract = row.get("abstract", "").strip()
-            print(f"[{i}/{len(todo)}] {title[:80]}")
+            url = row.get("url", "").strip()
+            #print(f"[{i}/{len(todo)}] {title[:80]}")
 
             try:
-                annotations, usage = annotate_paper(client, title, abstract)
+                annotations, usage = annotate_paper(client, title, abstract, url)
             except anthropic.APIError as e:
                 print(f"  error: {type(e).__name__}: {e}", file=sys.stderr)
                 n_err += 1
@@ -235,6 +274,7 @@ def main() -> None:
                 "title": title,
                 "doi": row.get("doi", ""),
                 "arxiv_id": row.get("arxiv_id", ""),
+                "url": url,
                 **annotations,
             }
             out_f.write(json.dumps(record, ensure_ascii=False) + "\n")
