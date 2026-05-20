@@ -26,12 +26,33 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 import squarify
 from matplotlib.patches import Rectangle
 from matplotlib.ticker import MultipleLocator
 
 HERE = Path(__file__).parent
 CORPORA = ("ai-sycophancy", "sycophancy")
+END_YEAR = 2026
+
+# Paper-figure styling: figures get shrunk in print, so bump fonts and use
+# a clean grid background that survives reduction.
+sns.set_theme(
+    style="whitegrid",
+    context="notebook",
+    font_scale=1.3,
+    rc={
+        "axes.titleweight": "bold",
+        "axes.titlepad": 12,
+        "axes.labelweight": "medium",
+        "savefig.bbox": "tight",
+    },
+)
+
+
+def _year_ticks(start: int, stride: int = 2) -> list[int]:
+    """Year ticks every `stride` years, anchored so END_YEAR is always shown."""
+    return list(range(END_YEAR, start - 1, -stride))[::-1]
 
 
 def load(results_path: Path) -> pd.DataFrame:
@@ -99,12 +120,14 @@ def write_summary(df: pd.DataFrame, out: Path, has_citations: bool = True) -> No
 
 def plot_papers_per_year(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index()
+    start = int(counts.index.min())
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.bar(counts.index, counts.values, color="#3b6fb6")
     ax.set_xlabel("Year")
     ax.set_ylabel("Papers")
     ax.set_title(f"Papers mentioning {label} per year")
-    ax.set_xticks(counts.index)
+    ax.set_xticks(_year_ticks(start))
+    ax.set_xlim(start - 0.5, END_YEAR + 0.5)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
     fig.savefig(out, dpi=150)
@@ -114,6 +137,7 @@ def plot_papers_per_year(df: pd.DataFrame, out: Path, label: str) -> None:
 
 def plot_papers_per_year_line(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index()
+    start = int(counts.index.min())
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(counts.index, counts.values, marker="o", color="#3b6fb6", linewidth=2)
     ax.fill_between(counts.index, counts.values, alpha=0.15, color="#3b6fb6")
@@ -121,6 +145,7 @@ def plot_papers_per_year_line(df: pd.DataFrame, out: Path, label: str) -> None:
     ax.set_ylabel("Papers")
     ax.set_title(f"Papers mentioning {label} per year")
     ax.xaxis.set_major_locator(MultipleLocator(10))
+    ax.set_xlim(start, END_YEAR)
     ax.grid(True, alpha=0.3)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
@@ -131,12 +156,14 @@ def plot_papers_per_year_line(df: pd.DataFrame, out: Path, label: str) -> None:
 
 def plot_citations_per_year(df: pd.DataFrame, out: Path, label: str) -> None:
     cites = df.groupby("year")["citation_count"].sum().sort_index()
+    start = int(cites.index.min())
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.bar(cites.index, cites.values, color="#c2511f")
     ax.set_xlabel("Publication year")
     ax.set_ylabel("Total citations (as of scrape date)")
     ax.set_title(f"Citations to {label} papers, by publication year")
-    ax.set_xticks(cites.index)
+    ax.set_xticks(_year_ticks(start))
+    ax.set_xlim(start - 0.5, END_YEAR + 0.5)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
     fig.savefig(out, dpi=150)
@@ -148,12 +175,14 @@ def plot_combined(df: pd.DataFrame, out: Path, label: str) -> None:
     """Papers (bars) and citations (line) on the same time axis."""
     by_year = df.groupby("year").agg(papers=("title", "count"),
                                      citations=("citation_count", "sum")).sort_index()
+    start = int(by_year.index.min())
     fig, ax1 = plt.subplots(figsize=(9, 5))
     ax1.bar(by_year.index, by_year["papers"], color="#3b6fb6", label="Papers")
     ax1.set_xlabel("Year")
     ax1.set_ylabel("Papers", color="#3b6fb6")
     ax1.tick_params(axis="y", labelcolor="#3b6fb6")
-    ax1.set_xticks(by_year.index)
+    ax1.set_xticks(_year_ticks(start))
+    ax1.set_xlim(start - 0.5, END_YEAR + 0.5)
     plt.setp(ax1.get_xticklabels(), rotation=45, ha="right")
 
     ax2 = ax1.twinx()
@@ -328,13 +357,15 @@ def plot_domain_treemap(df: pd.DataFrame, out: Path, label: str) -> None:
 
 def plot_cumulative(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index().cumsum()
+    start = int(counts.index.min())
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(counts.index, counts.values, marker="o", color="#2a8c5b")
     ax.fill_between(counts.index, counts.values, alpha=0.2, color="#2a8c5b")
     ax.set_xlabel("Year")
     ax.set_ylabel("Cumulative papers")
     ax.set_title(f"Cumulative {label} papers over time")
-    ax.set_xticks(counts.index)
+    ax.set_xticks(_year_ticks(start))
+    ax.set_xlim(start - 0.5, END_YEAR + 0.5)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
     fig.savefig(out, dpi=150)

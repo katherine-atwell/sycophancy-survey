@@ -30,6 +30,9 @@ SYCOPHANCY_TERMS = {
     "sycophantic", "sycophantically", "sycophancies",
 }
 
+# Additional custom stopwords to remove from the word cloud
+CUSTOM_STOPWORDS = {"model", "models", "ai", "a.i.", "artificial", "intelligence", "language", "large"}
+
 
 def collect_definitions(path: Path) -> list[str]:
     out: list[str] = []
@@ -70,7 +73,7 @@ def main() -> None:
         raise SystemExit("no usable definitions found — was the verbatim backfill run?")
 
     text = " ".join(definitions)
-    stopwords = set(STOPWORDS) | SYCOPHANCY_TERMS
+    stopwords = set(STOPWORDS) | SYCOPHANCY_TERMS | CUSTOM_STOPWORDS
 
     wc = WordCloud(
         width=1600,
