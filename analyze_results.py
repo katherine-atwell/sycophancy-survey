@@ -21,10 +21,13 @@ Run:
 """
 
 import argparse
+from datetime import date
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import squarify
+from matplotlib.patches import Rectangle
 from matplotlib.ticker import MultipleLocator
 
 HERE = Path(__file__).parent
@@ -165,6 +168,164 @@ def plot_combined(df: pd.DataFrame, out: Path, label: str) -> None:
     print(f"Wrote {out}")
 
 
+# Venue-keyword rules for records whose `fields_of_study` is empty
+# (typically WoS-only rows). First match wins, so ordering matters:
+# unambiguous CS conferences first, then medicine/psych, broad CS last.
+VENUE_RULES: list[tuple[str, list[str]]] = [
+    ("Computer Science", [
+        "arxiv", "zenodo", "aaai", "acl ", "naacl", "emnlp", "neurips", "icml",
+        "iclr", "chi conference", "kdd", "ijcai", "natural language",
+        "computational linguistic", "machine learning", "nlp",
+    ]),
+    ("Medicine", [
+        "medic", "clinic", "hospit", "patient", "psychiatr", "surger", "diagnos",
+        "gastroentero", "infection", "epidemiolog", "healthcare", "jmir",
+        "annals of the academy of medicine", "open forum infectious",
+        "research square", "medrxiv", "biorxiv",
+    ]),
+    ("Psychology", ["psycholog", "cognit", "mental", "neurosci", "bj psych"]),
+    ("Education", [
+        "educat", "pedagog", "librarian", "library",
+        "trends in neuroscience and education",
+    ]),
+    ("Law", ["law", "legal", "jurispr"]),
+    ("Economics", ["economic", "finance", "accounting", "business", "management"]),
+    ("Sociology", [
+        "social", "sociolog", "semiotic", "policy", "polit", "cultural",
+        "anthropolog", "m/c journal", "humanit", "ssrn",
+    ]),
+    ("Philosophy", ["philosoph", "ethic", "foundations of science"]),
+    ("Multidisciplinary", ["nature", "pnas", "royal society"]),
+    ("Computer Science", [
+        "computer", "software", "artificial intelligence", "ai &", "ai,",
+        "linguistic", "electronic", "engineer", "workshop on",
+        "information technology", "knowledge-based",
+        "international journal of human-computer interaction",
+        "international conference on artificial intelligence",
+    ]),
+]
+
+
+def assign_domain(row: pd.Series) -> str:
+    """Assign a single domain label per paper.
+
+    S2's `fields_of_study` is authoritative when present (take the first
+    listed field, which is S2's primary classification). Otherwise infer
+    from venue with substring keyword rules; fall back to "Other".
+    """
+    fos = (row.get("fields_of_study") or "").strip()
+    if fos:
+        return fos.split(";")[0].strip()
+    venue = (row.get("venue") or "").lower()
+    if not venue:
+        return "Other"
+    for domain, keywords in VENUE_RULES:
+        if any(kw in venue for kw in keywords):
+            return domain
+    return "Other"
+
+
+def plot_domain_treemap(df: pd.DataFrame, out: Path, label: str) -> None:
+    """Treemap of paper domains for the last 5 calendar years. News excluded."""
+    current_year = date.today().year
+    window = (current_year - 4, current_year)
+    scholarly = df[~is_news(df)].copy()
+    recent = scholarly[scholarly["year"].between(*window)].copy()
+    if recent.empty:
+        print(f"Skipping {out.name}: no scholarly records in {window[0]}–{window[1]}")
+        return
+
+    recent["domain"] = recent.apply(assign_domain, axis=1)
+    counts = recent["domain"].value_counts()
+    total = int(counts.sum())
+
+    cmap = plt.get_cmap("tab20")
+    colors = [cmap(i % cmap.N) for i in range(len(counts))]
+
+    # Lay the treemap into the left ~70% of the axes and reserve the right
+    # ~30% for callout labels. Cells below the threshold get an arrow leader
+    # to an external label instead of overflowing text inside the box.
+    MIN_LABEL_FRAC = 0.014
+    PLOT_W, PLOT_H = 100.0, 100.0
+    MARGIN = 55.0
+
+    normed = squarify.normalize_sizes(counts.values.tolist(), PLOT_W, PLOT_H)
+    rects = squarify.squarify(normed, 0, 0, PLOT_W, PLOT_H)
+
+    fig, ax = plt.subplots(figsize=(13, 6.5))
+    ax.set_xlim(0, PLOT_W + MARGIN)
+    ax.set_ylim(0, PLOT_H)
+
+    callouts: list[dict] = []
+    for (name, n), color, rect in zip(counts.items(), colors, rects):
+        x, y, dx, dy = rect["x"], rect["y"], rect["dx"], rect["dy"]
+        ax.add_patch(Rectangle(
+            (x, y), dx, dy,
+            facecolor=color, alpha=0.85,
+            edgecolor="white", linewidth=2,
+        ))
+        if n / total >= MIN_LABEL_FRAC:
+            ax.text(
+                x + dx / 2, y + dy / 2,
+                f"{name}\n{n} ({n / total:.0%})",
+                ha="center", va="center", fontsize=11,
+            )
+        else:
+            callouts.append({
+                "name": name, "n": n, "color": color,
+                "x_right": x + dx,
+                "y_mid": y + dy / 2,
+                "y_bot": y, "y_top": y + dy,
+            })
+
+    # Stack callout labels in the right margin sorted top-down by cell. Each
+    # leader's anchor sits at a y close to its label (clipped to the cell's
+    # bounds) AND each leader bends at its own x — bend points are staggered
+    # so adjacent leaders never share the same horizontal segment. A small
+    # cell-coloured dot marks each anchor so the origin is unambiguous even
+    # where lines run close together.
+    callouts.sort(key=lambda c: -c["y_mid"])
+    LABEL_SPACING = 6.5
+    EDGE_INSET = 0.8
+    BEND_X_BASE = PLOT_W + 2     # innermost bend column
+    BEND_X_STEP = 1.8            # fan-out between consecutive leaders
+    TEXT_X = BEND_X_BASE + BEND_X_STEP * len(callouts) + 1
+    top_y = min(PLOT_H - 2, max(c["y_mid"] for c in callouts) + 3)
+    for i, c in enumerate(callouts):
+        ty = top_y - i * LABEL_SPACING
+        anchor_y = max(c["y_bot"] + EDGE_INSET,
+                       min(c["y_top"] - EDGE_INSET, ty))
+        bend_x = BEND_X_BASE + i * BEND_X_STEP
+        ax.plot(
+            [c["x_right"], bend_x, TEXT_X - 0.5],
+            [anchor_y, anchor_y, ty],
+            color="#333333", lw=1.0, solid_capstyle="round",
+            clip_on=False,
+        )
+        ax.plot(
+            c["x_right"], anchor_y,
+            marker="o", markersize=5,
+            markerfacecolor=c["color"],
+            markeredgecolor="#333333", markeredgewidth=0.6,
+            clip_on=False, zorder=10,
+        )
+        ax.text(
+            TEXT_X, ty,
+            f"{c['name']} — {c['n']} ({c['n'] / total:.1%})",
+            fontsize=9, ha="left", va="center",
+        )
+
+    ax.set_title(
+        f"Domains of {label} research papers, {window[0]}–{window[1]} "
+        f"(n={total})"
+    )
+    ax.axis("off")
+    fig.tight_layout()
+    fig.savefig(out, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Wrote {out}")
+
+
 def plot_cumulative(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index().cumsum()
     fig, ax = plt.subplots(figsize=(9, 5))
@@ -194,6 +355,7 @@ def write_results(df: pd.DataFrame, out_dir: Path, label: str, has_citations: bo
     plot_papers_per_year(df, out_dir / "papers_per_year.png", label)
     plot_papers_per_year_line(df, out_dir / "papers_per_year_line.png", label)
     plot_cumulative(df, out_dir / "cumulative_papers.png", label)
+    plot_domain_treemap(df, out_dir / "domain_treemap.png", label)
     if has_citations:
         plot_citations_per_year(df, out_dir / "citations_per_year.png", label)
         plot_combined(df, out_dir / "papers_and_citations.png", label)
