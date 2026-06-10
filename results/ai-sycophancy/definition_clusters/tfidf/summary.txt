@@ -1,0 +1,88 @@
+Definitions clustered: 113
+Unique definitions:    111
+
+Pairwise cosine similarity (all unique pairs):
+  min:    0.000
+  median: 0.000
+  mean:   0.018
+  max:    1.000
+  std:    0.042
+
+KMeans clustering  (best k=8, silhouette=0.023):
+  Cluster 0 (n=27)
+    top terms: accuracy, factual, factual accuracy, expense, agree, visual, evidence, reinforce
+    - [] sycophancy refers to the tendency of models to excessively agree with or flatter users, often at the expense of factual accuracy
+    - [] an excessive tendency of AI models to agree with user input at the expense of factual accuracy or in contradiction of visual evidence
+    - [] Sycophancy in Vision-Language Models (VLMs) refers to their tendency to align with user opinions, often at the expense of moral or factual accuracy.
+    - [] sycophancy, the tendency to align with user beliefs regardless of correctness
+
+  Cluster 1 (n=21)
+    top terms: views, view, incorrect, regardless, align, outputs, answers, liberal
+    - [] the tendency of AI to align their outputs with their user's views or preferences, even if this view is incorrect
+    - [] the tendency of a large language model to align its outputs with the user's perceived preferences, beliefs, or opinions, in order to look favorable, regardless of whether those statements are factually correct
+    - [] the tendency to agree with user statements regardless of validity
+    - [] the models tend to generate incorrect answers to align with user expectations
+
+  Cluster 2 (n=12)
+    top terms: agreement, excessive, excessive agreement, prioritizing agreement, prioritizing, agreement flattery, agreement independent, independent reasoning
+    - [] excessive agreement with user challenges
+    - [] prioritizing user agreement over independent reasoning
+    - [] prioritizing user agreement over independent reasoning
+    - [] sycophantic behaviors -- such as excessive agreement with or flattery of the user
+
+  Cluster 3 (n=20)
+    top terms: known, agreement, prioritize, leading, prompts, prioritize agreement, frequently, phenomenon
+    - [] large language models (LLMs) frequently prioritize agreement over accuracy when responding to illogical medical prompts, a behavior known as sycophancy
+    - [] Large Language Models (LLMs) increasingly prioritize user validation over epistemic accuracy - a phenomenon known as sycophancy.
+    - [] the tendency of language models to prioritize agreement with user preferences over principled reasoning
+    - [] Large Language Models (LLMs) frequently prioritize conflicting in-context information over pre-existing parametric memory, a phenomenon often termed sycophancy or compliance.
+
+  Cluster 4 (n=9)
+    top terms: hear, want, want hear, entirely, entirely correct, provide answers, match want, tend provide
+    - [] these models tend to provide answers that match what users want to hear, even if they are not entirely correct
+    - [] sycophantic tendencies of Large Language Models (LLMs), where these models tend to provide answers that match what users want to hear, even if they are not entirely correct
+    - [] the tendency to tell users what they want to hear rather than what is true
+    - [] Single models are prone to "sycophancy"-telling the user what they want to hear.
+
+  Cluster 5 (n=5)
+    top terms: illogical, comply, requests, generate, false, knowledge identify, illogical requests, identify request
+    - [] a tendency to comply with illogical requests that would generate false information, even when they have the knowledge to identify the request as illogical
+    - [] a tendency to comply with illogical requests that would generate misinformation, even when they have the knowledge to identify the request as illogical
+    - [] refusing to comply with requests for a political position the user is likely to disagree with
+    - [] LLMs generate coherent reasoning for false premises ("Sycophancy")
+
+  Cluster 6 (n=10)
+    top terms: stated, opinions, contradict, stated opinions, agreeing, factual, contradict factual, agreeing stated
+    - [] agreeing with user-stated opinions even when those contradict factual knowledge
+    - [] agreeing with user-stated opinions even when those contradict factual knowledge
+    - [] generating responses that align with or agree with a user's stated opinions or preferences, even when those opinions are incorrect or biased
+    - [] distorting responses to align with user beliefs, notably by readily agreeing with user counterarguments
+
+  Cluster 7 (n=9)
+    top terms: flattering, agreeable, excessively, overly, agreeing flattering, excessively agreeing, term, agreeing
+    - [] excessively agreeing with or flattering users
+    - [] sycophancy, the phenomenon of artificial intelligence (AI) excessively agreeing with or flattering users
+    - [] overly agreeable or flattering behavior
+    - [] AI companions tend to be excessively agreeable with users (AI sycophancy)
+
+HDBSCAN clustering (natural clusters, -1 = noise):
+  NOISE (n=96)
+    top terms: correct, incorrect, agreeing, beliefs, agreement, align, tend, answers
+    - [] sycophantic tendencies of Large Language Models (LLMs), where these models tend to provide answers that match what users want to hear, even if they are not entirely correct
+    - [] the tendency of a large language model to align its outputs with the user's perceived preferences, beliefs, or opinions, in order to look favorable, regardless of whether those statements are factually correct
+    - [] generating responses that align with or agree with a user's stated opinions or preferences, even when those opinions are incorrect or biased
+    - [] agreeing with user-stated opinions even when those contradict factual knowledge
+
+  Cluster 0 (n=12)
+    top terms: factual accuracy, factual, beliefs, expense, accuracy, agree, prioritizing agreement, prioritizing
+    - [] prioritizing user agreement over factual accuracy
+    - [] prioritizing user agreement over independent reasoning
+    - [] prioritizing user agreement over independent reasoning
+    - [] conforming to user beliefs regardless of factual accuracy or ethical soundness
+
+  Cluster 1 (n=5)
+    top terms: prioritize, known, frequently prioritize, principled reasoning, principled, agreement, prioritize agreement, phenomenon
+    - [] large language models (LLMs) frequently prioritize agreement over accuracy when responding to illogical medical prompts, a behavior known as sycophancy
+    - [] Large Language Models (LLMs) increasingly prioritize user validation over epistemic accuracy - a phenomenon known as sycophancy.
+    - [] the tendency of language models to prioritize agreement with user preferences over principled reasoning
+    - [] Large Language Models (LLMs) frequently prioritize conflicting in-context information over pre-existing parametric memory, a phenomenon often termed sycophancy or compliance.

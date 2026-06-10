@@ -35,15 +35,29 @@ HERE = Path(__file__).parent
 CORPORA = ("ai-sycophancy", "sycophancy")
 END_YEAR = 2026
 
-# Paper-figure styling: figures get shrunk in print, so bump fonts and use
-# a clean grid background that survives reduction.
+# Shared palette (coolors.co/243e36-ffaf87-74a57f-ff8e72-ed6a5e).
+PALETTE = {
+    "primary":   "#243E36",  # dark green — papers/year, main bars
+    "secondary": "#74A57F",  # sage       — cumulative, secondary
+    "accent":    "#ED6A5E",  # red-coral  — citations, twin-axis accent
+    "warm":      "#FF8E72",  # coral      — extra accent
+    "light":     "#FFAF87",  # peach      — highlights, treemap blends
+}
+PALETTE_ORDER = [
+    PALETTE["primary"], PALETTE["secondary"], PALETTE["accent"],
+    PALETTE["warm"], PALETTE["light"],
+]
+
+# Paper-figure styling: figures get shrunk in two-column print, so bump
+# font_scale and figsize so labels stay legible after reduction.
 sns.set_theme(
-    style="whitegrid",
+    style="ticks",
     context="notebook",
-    font_scale=1.3,
+    font_scale=2.0,
+    palette=PALETTE_ORDER,
     rc={
         "axes.titleweight": "bold",
-        "axes.titlepad": 12,
+        "axes.titlepad": 14,
         "axes.labelweight": "medium",
         "savefig.bbox": "tight",
     },
@@ -121,14 +135,15 @@ def write_summary(df: pd.DataFrame, out: Path, has_citations: bool = True) -> No
 def plot_papers_per_year(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index()
     start = int(counts.index.min())
-    fig, ax = plt.subplots(figsize=(9, 5))
-    ax.bar(counts.index, counts.values, color="#3b6fb6")
+    fig, ax = plt.subplots(figsize=(11, 6.5))
+    ax.bar(counts.index, counts.values, color=PALETTE["primary"])
     ax.set_xlabel("Year")
     ax.set_ylabel("Papers")
     ax.set_title(f"Papers mentioning {label} per year")
     ax.set_xticks(_year_ticks(start))
     ax.set_xlim(start - 0.5, END_YEAR + 0.5)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    sns.despine(fig)
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
@@ -138,16 +153,16 @@ def plot_papers_per_year(df: pd.DataFrame, out: Path, label: str) -> None:
 def plot_papers_per_year_line(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index()
     start = int(counts.index.min())
-    fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(counts.index, counts.values, marker="o", color="#3b6fb6", linewidth=2)
-    ax.fill_between(counts.index, counts.values, alpha=0.15, color="#3b6fb6")
+    fig, ax = plt.subplots(figsize=(11, 6.5))
+    ax.plot(counts.index, counts.values, marker="o", color=PALETTE["primary"], linewidth=2)
+    ax.fill_between(counts.index, counts.values, alpha=0.15, color=PALETTE["primary"])
     ax.set_xlabel("Year")
     ax.set_ylabel("Papers")
     ax.set_title(f"Papers mentioning {label} per year")
     ax.xaxis.set_major_locator(MultipleLocator(10))
     ax.set_xlim(start, END_YEAR)
-    ax.grid(True, alpha=0.3)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    sns.despine(fig)
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
@@ -157,14 +172,15 @@ def plot_papers_per_year_line(df: pd.DataFrame, out: Path, label: str) -> None:
 def plot_citations_per_year(df: pd.DataFrame, out: Path, label: str) -> None:
     cites = df.groupby("year")["citation_count"].sum().sort_index()
     start = int(cites.index.min())
-    fig, ax = plt.subplots(figsize=(9, 5))
-    ax.bar(cites.index, cites.values, color="#c2511f")
+    fig, ax = plt.subplots(figsize=(11, 6.5))
+    ax.bar(cites.index, cites.values, color=PALETTE["accent"])
     ax.set_xlabel("Publication year")
     ax.set_ylabel("Total citations (as of scrape date)")
     ax.set_title(f"Citations to {label} papers, by publication year")
     ax.set_xticks(_year_ticks(start))
     ax.set_xlim(start - 0.5, END_YEAR + 0.5)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    sns.despine(fig)
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
@@ -176,21 +192,25 @@ def plot_combined(df: pd.DataFrame, out: Path, label: str) -> None:
     by_year = df.groupby("year").agg(papers=("title", "count"),
                                      citations=("citation_count", "sum")).sort_index()
     start = int(by_year.index.min())
-    fig, ax1 = plt.subplots(figsize=(9, 5))
-    ax1.bar(by_year.index, by_year["papers"], color="#3b6fb6", label="Papers")
+    fig, ax1 = plt.subplots(figsize=(11, 6.5))
+    ax1.bar(by_year.index, by_year["papers"], color=PALETTE["primary"], label="Papers")
     ax1.set_xlabel("Year")
-    ax1.set_ylabel("Papers", color="#3b6fb6")
-    ax1.tick_params(axis="y", labelcolor="#3b6fb6")
+    ax1.set_ylabel("Papers", color=PALETTE["primary"])
+    ax1.tick_params(axis="y", labelcolor=PALETTE["primary"])
     ax1.set_xticks(_year_ticks(start))
     ax1.set_xlim(start - 0.5, END_YEAR + 0.5)
     plt.setp(ax1.get_xticklabels(), rotation=45, ha="right")
 
     ax2 = ax1.twinx()
-    ax2.plot(by_year.index, by_year["citations"], color="#c2511f", marker="o", label="Citations")
-    ax2.set_ylabel("Total citations", color="#c2511f")
-    ax2.tick_params(axis="y", labelcolor="#c2511f")
+    ax2.plot(by_year.index, by_year["citations"], color=PALETTE["accent"],
+             marker="o", linewidth=2, label="Citations")
+    ax2.set_ylabel("Total citations", color=PALETTE["accent"])
+    ax2.tick_params(axis="y", labelcolor=PALETTE["accent"])
 
     ax1.set_title(f"{label}: papers and citations over time")
+    # Despine top spine only — both y-axes (left/right) are in use here.
+    sns.despine(ax=ax1, top=True, right=False)
+    sns.despine(ax=ax2, top=True, right=False)
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
@@ -268,8 +288,9 @@ def plot_domain_treemap(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = recent["domain"].value_counts()
     total = int(counts.sum())
 
-    cmap = plt.get_cmap("tab20")
-    colors = [cmap(i % cmap.N) for i in range(len(counts))]
+    # Interpolate the 5-color palette across however many domains we have so
+    # neighboring slices read as related but distinguishable.
+    colors = sns.blend_palette(PALETTE_ORDER, n_colors=max(len(counts), 2))
 
     # Lay the treemap into the left ~70% of the axes and reserve the right
     # ~30% for callout labels. Cells below the threshold get an arrow leader
@@ -281,7 +302,7 @@ def plot_domain_treemap(df: pd.DataFrame, out: Path, label: str) -> None:
     normed = squarify.normalize_sizes(counts.values.tolist(), PLOT_W, PLOT_H)
     rects = squarify.squarify(normed, 0, 0, PLOT_W, PLOT_H)
 
-    fig, ax = plt.subplots(figsize=(13, 6.5))
+    fig, ax = plt.subplots(figsize=(14, 7.5))
     ax.set_xlim(0, PLOT_W + MARGIN)
     ax.set_ylim(0, PLOT_H)
 
@@ -297,7 +318,7 @@ def plot_domain_treemap(df: pd.DataFrame, out: Path, label: str) -> None:
             ax.text(
                 x + dx / 2, y + dy / 2,
                 f"{name}\n{n} ({n / total:.0%})",
-                ha="center", va="center", fontsize=11,
+                ha="center", va="center", fontsize=16,
             )
         else:
             callouts.append({
@@ -341,7 +362,7 @@ def plot_domain_treemap(df: pd.DataFrame, out: Path, label: str) -> None:
         ax.text(
             TEXT_X, ty,
             f"{c['name']} — {c['n']} ({c['n'] / total:.1%})",
-            fontsize=9, ha="left", va="center",
+            fontsize=13, ha="left", va="center",
         )
 
     ax.set_title(
@@ -358,15 +379,16 @@ def plot_domain_treemap(df: pd.DataFrame, out: Path, label: str) -> None:
 def plot_cumulative(df: pd.DataFrame, out: Path, label: str) -> None:
     counts = df.groupby("year").size().sort_index().cumsum()
     start = int(counts.index.min())
-    fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(counts.index, counts.values, marker="o", color="#2a8c5b")
-    ax.fill_between(counts.index, counts.values, alpha=0.2, color="#2a8c5b")
+    fig, ax = plt.subplots(figsize=(11, 6.5))
+    ax.plot(counts.index, counts.values, marker="o", color=PALETTE["secondary"], linewidth=2)
+    ax.fill_between(counts.index, counts.values, alpha=0.25, color=PALETTE["secondary"])
     ax.set_xlabel("Year")
     ax.set_ylabel("Cumulative papers")
     ax.set_title(f"Cumulative {label} papers over time")
     ax.set_xticks(_year_ticks(start))
     ax.set_xlim(start - 0.5, END_YEAR + 0.5)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+    sns.despine(fig)
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)

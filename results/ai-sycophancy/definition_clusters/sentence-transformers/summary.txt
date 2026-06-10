@@ -1,0 +1,67 @@
+Definitions clustered: 113
+Unique definitions:    111
+
+Pairwise cosine similarity (all unique pairs):
+  min:    -0.102
+  median: 0.334
+  mean:   0.342
+  max:    1.000
+  std:    0.148
+
+KMeans clustering  (best k=3, silhouette=0.161):
+  Cluster 0 (n=21)
+    top terms: visual, visual evidence, align, correct, accuracy, view, misleading, preferences
+    - [] an excessive tendency of AI models to agree with user input at the expense of factual accuracy or in contradiction of visual evidence
+    - [] the tendency of these models to align with user input even when it contradicts the visual evidence
+    - [] an emergent misalignment where models follow misleading cues instead of factual correctness
+    - [] the models tend to generate incorrect answers to align with user expectations
+
+  Cluster 1 (n=49)
+    top terms: agreement, stated, prioritizing agreement, knowledge, affirming, agreeing, agree, opinions
+    - [] the tendency to agree with user statements regardless of validity
+    - [] the tendency to agree with user assertions even when they contradict objective evidence
+    - [] the tendency of a model to agree with or reinforce user-provided information even when it's factually incorrect
+    - [] distorting responses to align with user beliefs, notably by readily agreeing with user counterarguments
+
+  Cluster 2 (n=43)
+    top terms: known, agreement, phenomenon, beliefs, tend, prioritize, frequently, premises
+    - [] sycophancy refers to the tendency of models to excessively agree with or flatter users, often at the expense of factual accuracy
+    - [] sycophancy, the tendency to align with user beliefs regardless of correctness
+    - [] the models can even "agree" with wrong ideas, a trait called sycophancy
+    - [] Models often adopt user beliefs (sycophancy)
+
+HDBSCAN clustering (natural clusters, -1 = noise):
+  NOISE (n=67)
+    top terms: excessive, visual, preferences, evidence, view, views, agreement, illogical
+    - [] an undesirable behavior where models tailor their responses to follow a human user's view even when that view is not objectively correct (e.g., adapting liberal views once a user reveals that they are liberal)
+    - [] a tendency to produce reasoning that matches users' beliefs over truthful ones, which deviates from instruction-following principles
+    - [] a tendency toward excessive agreeability
+    - [] the tendency to shift outputs toward user-expressed stances, regardless of correctness or consistency
+
+  Cluster 0 (n=13)
+    top terms: tend, correct, prioritize, provide, answers, match want, frequently prioritize, entirely correct
+    - [] Large Language Models (LLMs) tend to prioritize adherence to user prompts over providing veracious responses, leading to the sycophancy issue. When challenged by users, LLMs tend to admit mistakes and provide inaccurate responses even if they initially provided the correct ans...
+    - [] sycophantic tendencies of Large Language Models (LLMs), where these models tend to provide answers that match what users want to hear, even if they are not entirely correct
+    - [] large language models (LLMs) frequently prioritize agreement over accuracy when responding to illogical medical prompts, a behavior known as sycophancy
+    - [] Large Language Models (LLMs) increasingly prioritize user validation over epistemic accuracy - a phenomenon known as sycophancy.
+
+  Cluster 1 (n=16)
+    top terms: beliefs, biased, known, refers, alignment, agreement, agree, phenomenon
+    - [] sycophancy refers to the tendency of models to excessively agree with or flatter users, often at the expense of factual accuracy
+    - [] sycophancy, the tendency to align with user beliefs regardless of correctness
+    - [] the models can even "agree" with wrong ideas, a trait called sycophancy
+    - [] sycophantic behavior, which occurs when a model aligns with a user's beliefs in order to look favorable even if it is not objectively correct
+
+  Cluster 2 (n=11)
+    top terms: contradict, factual, stated, regardless, validity, opinions contradict, contradict factual, conforming beliefs
+    - [] the tendency to agree with user assertions even when they contradict objective evidence
+    - [] agreeing with user-stated opinions even when those contradict factual knowledge
+    - [] agreeing with user-stated opinions even when those contradict factual knowledge
+    - [] showing a stronger tendency to affirm a user's stated or implied belief even when this conflicts with factual accuracy or sound judgment
+
+  Cluster 3 (n=6)
+    top terms: prioritizing agreement, agreement, prioritizing, reasoning, independent reasoning, agreement independent, reasoning prioritize, prioritize agreement
+    - [] prioritizing user agreement over independent reasoning
+    - [] prioritizing user agreement over independent reasoning
+    - [] prioritizing user agreement over factual accuracy
+    - [] prioritizing agreement with their users over accurate or objective statements

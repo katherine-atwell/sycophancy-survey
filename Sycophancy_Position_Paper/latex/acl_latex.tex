@@ -1,0 +1,213 @@
+\documentclass[11pt]{article}
+
+% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
+% Change to "preprint" to generate a non-anonymous version with page numbers.
+\usepackage[review]{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% This is also not strictly necessary, and may be commented out.
+% However, it will improve the aesthetics of text in
+% the typewriter font.
+\usepackage{inconsolata}
+
+%Including images in your LaTeX document requires adding
+%additional package(s)
+\usepackage{graphicx}
+
+\usepackage{enumitem}
+
+%\usepackage{xurl}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+\title{A Construct Validity Crisis in AI Sycophancy Evaluation}
+
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a separate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+\author{First Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\}
+
+%\author{
+%  \textbf{First Author\textsuperscript{1}},
+%  \textbf{Second Author\textsuperscript{1,2}},
+%  \textbf{Third T. Author\textsuperscript{1}},
+%  \textbf{Fourth Author\textsuperscript{1}},
+%\\
+%  \textbf{Fifth Author\textsuperscript{1,2}},
+%  \textbf{Sixth Author\textsuperscript{1}},
+%  \textbf{Seventh Author\textsuperscript{1}},
+%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
+%\\
+%  \textbf{Ninth Author\textsuperscript{1}},
+%  \textbf{Tenth Author\textsuperscript{1}},
+%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
+%  \textbf{Twelfth Author\textsuperscript{1}},
+%\\
+%  \textbf{Thirteenth Author\textsuperscript{3}},
+%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
+%  \textbf{Fifteenth Author\textsuperscript{1}},
+%  \textbf{Sixteenth Author\textsuperscript{1}},
+%\\
+%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
+%  \textbf{Eighteenth Author\textsuperscript{3,4}},
+%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
+%  \textbf{Twentieth Author\textsuperscript{1}}
+%\\
+%\\
+%  \textsuperscript{1}Affiliation 1,
+%  \textsuperscript{2}Affiliation 2,
+%  \textsuperscript{3}Affiliation 3,
+%  \textsuperscript{4}Affiliation 4,
+%  \textsuperscript{5}Affiliation 5
+%\\
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
+%  }
+%}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Sycophantic behavior is an established problem in AI systems, with concerns growing from users and researchers alike about the harmful effects of overly people-pleasing behavior in these models. However, there is disagreement between many researchers regarding what exactly counts as ``AI sycophancy'', and empirical studies primarily focus on a small subset of sycophantic behaviors with easily-measurable impacts on response quality. Further, few studies have evaluated the downstream impacts of sycophantic AI systems, particularly in the medium-to-long-term. In this position paper, we propose a unified definition of AI sycophancy, which involves displacement of context-relevant norms associated with approval-seeking behavior. We provide a framework for isolating, evaluating, and documenting sycophantic behaviors which prioritizes harm reduction and allows for a greater understanding of broader impacts. We outline a roadmap for this impact-centered framework, identify critical gaps in current evaluation practices, and provide recommendations regarding best practices and areas of future research. We believe that this framework is a step towards developing consensus, studying more diverse behaviors, and designing more effective evaluations for AI sycophancy.
+% Think about EMNLP's ``Rethinking progress and evaluation in NLP'' goal - ``For example, going beyond static leaderboards, including real-world impact, trustworthiness, robustness, and longitudinal behavior; what “generalization” should mean for humans vs models, and when models are reused, adapted, and deployed in diverse settings, etc''
+\end{abstract}
+
+\input{sections/01-introduction}
+\input{sections/02-background}
+\input{sections/03-media}
+\input{sections/04-impacts}
+\input{sections/05-future-directions}
+\input{sections/06-conclusion}
+
+% \begin{enumerate}
+%     \item Motivation: findings related to people-pleasing in LLMs and case studies showing the harms of sycophancy
+%     \item Trends in AI research, news coverage, and online discourse
+%     \item Position: how researchers measure AI sycophancy often diverges from users' perceptions of AI sycophancy and major concerns about it.
+%     \item Position: We are at the point now where we have largely empirically validated the existence of sycophancy in LLMs, and even developed some mitigation strategies for it
+%     \item Position: now, we need more research on the long-term impacts of sycophancy 
+%     \begin{enumerate}
+%         \item Can help us better understand the dangers of this phenomenon, and which sycophantic behaviors causes the most harm, so we can target our mitigation strategies
+%         \item Can also help us distinguish sycophancy from things like personalization and empathetic behavior - the line between adjusting for human preferences and excessive people-pleasing could be drawn based on the negative impacts over time
+%     \end{enumerate}
+%     \item One way to distinguish sycophancy from normal preference optimization, in the case of a lack of ground truth, could be by studying the impacts of this behavior (characterize ``excessive'')
+%     \item Personalization vs. sycophancy
+%     \item Empathetic behavior vs. sycophancy
+%     \item Describe gap in the literature and need for a survey paper that proposes an al-encompassing definition of AI sycophancy and reviews works that span different domains
+%     \item Brief timeline of AI sycophancy research
+%     \item Introduce review and describe methods used
+%     \item Taxonomy of AI sycophancy research 
+%     \begin{enumerate}
+%         \item Different disciplines
+%         \item Modalities: vision, text, audio
+%         \item Empirical methods
+%         \item Simulations vs. user studies
+%         \item Single-turn vs. multi-turn
+%     \end{enumerate}
+%     \item Metrics used to measure sycophancy
+%     \begin{enumerate}
+%         \item Switching behavior
+%         \item Divergence from ground truth
+%         \item Excessive flattery
+%         \item Factuality
+%         \item Bayesian rationality
+%     \end{enumerate}
+%     \item Findings
+%     \begin{enumerate}
+%         \item Sycophantic behaviors identified
+%          \item User perception of AI sycophancy and impact on users' judgments
+%          \item Impact on multi-agent interactions
+%         \begin{enumerate}
+%             \item Controlled experiments
+%             \item Surveys
+%             \item Social media data
+%         \end{enumerate}
+%         \item Mitigation strategies
+%     \end{enumerate}
+%     \item Gaps in existing research
+%     \item Lack of standardized definition
+%     \item Future directions
+%     \begin{enumerate}
+%     \item More studies examining the effects of sycophantic behavior on users
+%         \item More longitudinal studies
+%         \item Multi-turn conversations and conversation length vs. sycophancy observed
+%         \item Sycophancy in-the-wild
+%     \end{enumerate}
+% \end{enumerate}
+
+
+% \section{Experiments/Analyses}
+
+% \begin{enumerate}
+%     \item Keyword searches for terms related to AI sycophancy in CS venues (ACM, IEEE, ACL, etc.) and in other disciplines (psychology, ethics, philosophy, etc.)
+%     \begin{enumerate}
+%         \item ProQuest
+%         \item PhilPapers
+%         \item Academic Search Ultimate
+%         \item JSTOR
+%         \item OneSearch - can create a user profile and save searches to user profile. 
+%         Look at the subject breakdown and filter by language (English) and maybe filter out reviews. Can see the breakdown in disciplines
+%         \item May have to do individual databases for abstract searches
+%         \item Philosopher's index
+%         \item Project Muse
+%         \item ProQuest One Academic (dissertations and theses)
+%         \item News/Media: Access World News Research Collection (Newsbank), New York Times, Washington Post, Wall Street Journal
+%         \item Web of Science - good for citation tracking, data visualizations, etc. Also has abstract search
+%         \item Look at OneSearch and see which disciplines and media types are coming up then target my search further
+%     \end{enumerate}
+%     \item Small Reddit experiment analyzing posts on r/ChatGPT and other subreddits about generative AI models
+
+% \end{enumerate}
+
+\bibliography{anthology-1,anthology-2,custom}
+
+\appendix
+
+\section{Example Appendix}
+\label{sec:appendix}
+
+This is an appendix.
+
+\end{document}

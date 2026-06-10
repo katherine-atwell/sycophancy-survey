@@ -1,0 +1,114 @@
+Total impact cards: 360
+
+Evidence Maturity Ladder:
+   33  ( 9.2%)  Behavioral detection
+  226  (62.8%)  Norm displacement
+   26  ( 7.2%)  Interaction impact
+    0  ( 0.0%)  Repeated interaction impact
+    0  ( 0.0%)  Institutional/societal impact
+   75  (20.8%)  None
+
+Time horizon:
+  193  Immediate
+   69  Short-term
+    2  Medium-term
+   12  Long-term
+   84  None
+
+Referent combo:
+  194  Position only
+   29  Person only
+   75  Both
+   62  Neither
+
+Position sub-referent (among Position-present papers):
+  106  Both
+  100  Verifiable
+   63  Subjective
+
+Person sub-referent (among Person-present papers):
+   46  Emotions
+   31  Traits
+   27  Both
+
+Papers proposing/testing mitigations: 238 / 360 (66.1%)
+
+Top 15 behaviors_measured:
+  150  opinion conformity
+   90  lack of pushback
+   89  position switching
+   82  answer bias
+   58  uncritical emotional validation
+   46  excessive flattery
+   44  social validation
+   15  error mimicry
+   11  sycophancy
+    8  hedging
+    8  emotional mimicry
+    5  length bias
+    4  sycophantic agreement
+    3  specification gaming
+    3  position switching under social pressure
+
+Top 15 norms_displaced:
+  183  accuracy
+  141  evidential independence
+  130  epistemic accuracy
+  104  calibration
+  101  factuality
+   55  cognitive autonomy
+   46  institutional integrity
+   38  fairness
+   29  rationality
+   15  moral autonomy
+   13  care
+    8  task quality
+    6  clinical accuracy
+    5  autonomy
+    5  honesty
+
+Top 15 proposed_mitigations:
+    2  incorporating additional sensing capabilities for real-world use
+    2  determining appropriate intervention timing beyond turn-taking interactions
+    2  model optimization for safer ai deployment
+    1  bias-augmented consistency training (bct): enforces output invariance across prompt augmentations
+    1  activation consistency training (act): enforces internal activation invariance across prompt augmentations
+    1  simplified reasoning structures as a design choice for robustness against expert-driven sycophancy
+    1  expert-guided prompting to detect and correct biases
+    1  user domain knowledge as prerequisite for detecting pitfalls
+    1  iterative prompting to address mainstreaming and lack of critical perspective
+    1  constitutional rag system (logos) with explicit anti-sycophancy rules
+    1  strict domain scope boundaries to prevent out-of-domain confabulation
+    1  domain-bounded theological audit pipeline
+    1  safety alignment fine-tuning of llms
+    1  visual information purification for evidence-based responses (viper) — proactively filters non-evidence-based social cues to reinforce evidence-based reasoning
+    1  use of reasoning-oriented models in the 8b–14b parameter range as cost-safety trade-off for pedagogical deployment
+
+Sample papers at each evidence rung (up to 5 each):
+  -- Behavioral detection (33) --
+    [2025] "Was there Bias in your Response?": LLM Anthropomorphic Traits in Context of Ability Bias Questioning
+    [2026] Lighting Up or Dimming Down? Exploring Dark Patterns of LLMs in Co-Creativity
+    [2025] Technological folie à deux: Feedback Loops Between AI Chatbots and Mental Illness
+    [2025] "What's Up, Doc?": Analyzing How Users Seek Health Information in Large-Scale Conversational AI Datasets
+    [2026] AI Hallucination from Students' Perspective: A Thematic Analysis
+
+  -- Norm displacement (226) --
+    [2025] Consistency Training Helps Stop Sycophancy and Jailbreaks
+    [2026] Overalignment in Frontier LLMs: An Empirical Study of Sycophantic Behaviour in Healthcare
+    [2025] "Check My Work?": Measuring Sycophancy in a Simulated Educational Context
+    [2026] Writing literature reviews with AI: principles, hurdles and some lessons learned
+    [2026] Training language models to be warm can reduce accuracy and increase sycophancy
+
+  -- Interaction impact (26) --
+    [2026] Mitigating Sycophancy and Hallucination in Large Language Models: The LOGOS Case Study in the Era of Reasoning Models (DeepSeek-R1, Gemini 3.0, ChatGPT-5)
+    [2025] Sycophantic AI Decreases Prosocial Intentions and Promotes Dependence
+    [2025] Probing the Gaps in ChatGPT Live Video Chat for Real-World Assistance for People who are Blind or Visually Impaired
+    [2026] The Rise of Verbal Tics in Large Language Models: A Systematic Analysis Across Frontier Models
+    [2025] Be Friendly, Not Friends: How LLM Sycophancy Shapes User Trust
+
+  -- None (75) --
+    [2025] Sycophancy Claims about Language Models: The Missing Human-in-the-Loop
+    [] When human-in-the-loop amplifies alignment risk
+    [2026] The hidden functions of sycophancy in AI systems: steering, consistency, and cognitive dependency
+    [2025] Causally Motivated Sycophancy Mitigation for Large Language Models
+    [2021] Theoretical Modeling of Communication Dynamics

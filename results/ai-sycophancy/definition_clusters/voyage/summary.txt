@@ -1,0 +1,46 @@
+Definitions clustered: 113
+Unique definitions:    111
+
+Pairwise cosine similarity (all unique pairs):
+  min:    0.319
+  median: 0.655
+  mean:   0.655
+  max:    1.000
+  std:    0.087
+
+KMeans clustering  (best k=2, silhouette=0.144):
+  Cluster 0 (n=52)
+    top terms: tend, align, correct, expense, beliefs, incorrect, accuracy, opinions
+    - [] sycophantic tendencies of Large Language Models (LLMs), where these models tend to provide answers that match what users want to hear, even if they are not entirely correct
+    - [] sycophantic behavior, which occurs when a model aligns with a user's beliefs in order to look favorable even if it is not objectively correct
+    - [] the tendency for LLMs to excessively agree with users even at the expense of truthfulness
+    - [] Large Language Models exhibit sycophancy: prioritizing agreeableness over correctness.
+
+  Cluster 1 (n=61)
+    top terms: agreement, accuracy, regardless, beliefs, excessive, factual, knowledge, prioritizing agreement
+    - [] sycophancy, the tendency to align with user beliefs regardless of correctness
+    - [] uncritically conforming to user beliefs
+    - [] the tendency to affirm a user's claims regardless of their validity
+    - [] the tendency to agree with user assertions even when they contradict objective evidence
+
+HDBSCAN clustering (natural clusters, -1 = noise):
+  NOISE (n=46)
+    top terms: agreement, reinforcing, incorrect, answers, correct, premises, blindly, term
+    - [] sycophancy, where agents reinforce each other's responses instead of critically engaging with the debate
+    - [] leading models to learn surface correlates such as agreement with the user (sycophancy)
+    - [] excessive agreement with user challenges
+    - [] sycophantic behaviors -- such as excessive agreement with or flattery of the user
+
+  Cluster 0 (n=59)
+    top terms: factual, beliefs, accuracy, regardless, prioritize, factual accuracy, align, agree
+    - [] sycophantic behavior, which occurs when a model aligns with a user's beliefs in order to look favorable even if it is not objectively correct
+    - [] the tendency for LLMs to excessively agree with users even at the expense of truthfulness
+    - [] sycophancy, the tendency to align with user beliefs regardless of correctness
+    - [] sycophantic tendencies of Large Language Models (LLMs), where these models tend to provide answers that match what users want to hear, even if they are not entirely correct
+
+  Cluster 1 (n=8)
+    top terms: agreement, excessive, dependent, dependent serves, judgment warmth, understood agreement, understood, agreeability
+    - [] agreeableness (sycophancy)
+    - [] persona-dependent sycophancy
+    - [] excessive agreement or flattery to avoid confrontation
+    - [] overly agreeable or flattering behavior
