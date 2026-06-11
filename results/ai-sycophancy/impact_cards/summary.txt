@@ -1,48 +1,48 @@
-Total impact cards: 360
+Total impact cards: 359
 
-Evidence Maturity Ladder:
+Evidence Level:
    33  ( 9.2%)  Behavioral detection
-  226  (62.8%)  Norm displacement
-   26  ( 7.2%)  Interaction impact
+  226  (63.0%)  Norm displacement
+   25  ( 7.0%)  Interaction impact
     0  ( 0.0%)  Repeated interaction impact
     0  ( 0.0%)  Institutional/societal impact
-   75  (20.8%)  None
+   75  (20.9%)  None
 
 Time horizon:
   193  Immediate
    69  Short-term
     2  Medium-term
-   12  Long-term
+   11  Long-term
    84  None
 
 Referent combo:
   194  Position only
    29  Person only
-   75  Both
+   74  Both
    62  Neither
 
 Position sub-referent (among Position-present papers):
   106  Both
   100  Verifiable
-   63  Subjective
+   62  Subjective
 
 Person sub-referent (among Person-present papers):
-   46  Emotions
+   45  Emotions
    31  Traits
    27  Both
 
-Papers proposing/testing mitigations: 238 / 360 (66.1%)
+Papers proposing/testing mitigations: 237 / 359 (66.0%)
 
 Top 15 behaviors_measured:
   150  opinion conformity
    90  lack of pushback
    89  position switching
    82  answer bias
-   58  uncritical emotional validation
+   57  uncritical emotional validation
    46  excessive flattery
    44  social validation
    15  error mimicry
-   11  sycophancy
+   10  sycophancy
     8  hedging
     8  emotional mimicry
     5  length bias
@@ -54,13 +54,13 @@ Top 15 norms_displaced:
   183  accuracy
   141  evidential independence
   130  epistemic accuracy
-  104  calibration
-  101  factuality
-   55  cognitive autonomy
-   46  institutional integrity
+  103  calibration
+  100  factuality
+   54  cognitive autonomy
+   45  institutional integrity
    38  fairness
    29  rationality
-   15  moral autonomy
+   14  moral autonomy
    13  care
     8  task quality
     6  clinical accuracy
@@ -99,7 +99,7 @@ Sample papers at each evidence rung (up to 5 each):
     [2026] Writing literature reviews with AI: principles, hurdles and some lessons learned
     [2026] Training language models to be warm can reduce accuracy and increase sycophancy
 
-  -- Interaction impact (26) --
+  -- Interaction impact (25) --
     [2026] Mitigating Sycophancy and Hallucination in Large Language Models: The LOGOS Case Study in the Era of Reasoning Models (DeepSeek-R1, Gemini 3.0, ChatGPT-5)
     [2025] Sycophantic AI Decreases Prosocial Intentions and Promotes Dependence
     [2025] Probing the Gaps in ChatGPT Live Video Chat for Real-World Assistance for People who are Blind or Visually Impaired

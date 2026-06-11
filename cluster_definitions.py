@@ -256,15 +256,15 @@ def plot_scatter(coords: np.ndarray, labels: np.ndarray, title: str, out: Path,
         if term_labels and c != -1 and term_labels.get(c):
             name += f" ({', '.join(term_labels[c][:3])})"
         ax.scatter(coords[mask, 0], coords[mask, 1],
-                   color=cmap[c], label=name, s=80, alpha=0.85,
+                   color=cmap[c], label=name, s=200, alpha=0.85,
                    edgecolor="white", linewidth=0.8)
     ax.set_xlabel("UMAP-1")
     ax.set_ylabel("UMAP-2")
-    ax.set_title(title)
-    ax.legend(loc="best", frameon=False, fontsize=14)
+    ax.set_title(title, fontsize=30)
+    ax.legend(loc="lower left", frameon=False, fontsize=18)
     sns.despine(fig)
     fig.tight_layout()
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=1000)
     plt.close(fig)
     print(f"Wrote {out}")
 
@@ -283,7 +283,7 @@ def plot_similarity_histogram(sim: np.ndarray, out: Path) -> None:
     ax.legend(frameon=False)
     sns.despine(fig)
     fig.tight_layout()
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=1000)
     plt.close(fig)
     print(f"Wrote {out}")
 
@@ -299,7 +299,7 @@ def plot_similarity_heatmap(sim: np.ndarray, labels: np.ndarray, out: Path) -> N
                 cbar_kws={"label": "cosine similarity"})
     ax.set_title("Pairwise similarity (sorted by KMeans cluster)")
     fig.tight_layout()
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=1000)
     plt.close(fig)
     print(f"Wrote {out}")
 
@@ -408,10 +408,10 @@ def run_pipeline(method: str, df: pd.DataFrame, base_outdir: Path,
     plot_similarity_histogram(sim, outdir / "similarity_distribution.png")
     plot_similarity_heatmap(sim, km_labels, outdir / "similarity_heatmap.png")
     plot_scatter(coords, km_labels,
-                 f"Definition clusters — {method} (KMeans, k={km_k})",
+                 f"Sycophancy definitions, clustered", # — {method} (KMeans, k={km_k})",
                  outdir / "umap_kmeans.png", term_labels=km_terms)
     plot_scatter(coords, hd_labels,
-                 f"Definition clusters — {method} (HDBSCAN, {n_hd_clusters} clusters + noise)",
+                 f"Sycophancy definitions, clustered", # — {method} (HDBSCAN, {n_hd_clusters} clusters + noise)",
                  outdir / "umap_hdbscan.png", term_labels=hd_terms)
 
     write_summary(outdir / "summary.txt", df, sim, km_k, km_labels, km_score,

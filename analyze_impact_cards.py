@@ -150,7 +150,7 @@ def write_summary(df: pd.DataFrame, out: Path, top_n: int) -> None:
     lines.append(f"Total impact cards: {len(df)}")
     lines.append("")
 
-    lines.append("Evidence Maturity Ladder:")
+    lines.append("Evidence Level:")
     counts = df["evidence_level"].value_counts()
     for level in EVIDENCE_ORDER:
         n = int(counts.get(level, 0))
@@ -321,7 +321,7 @@ def main() -> None:
 
     plot_categorical(
         df["evidence_level"].value_counts(), EVIDENCE_ORDER,
-        "Evidence Maturity Ladder", outdir / "evidence_level.png", "Evidence level",
+        "Evidence Level", outdir / "evidence_level.png", "Evidence level",
     )
     plot_categorical(
         df["time_horizon"].value_counts(), TIME_ORDER,
